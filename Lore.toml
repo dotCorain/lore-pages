@@ -1,0 +1,3 @@
+from_lore_path = "./lore"
+to_html_path = "./html"
+css_url = "style.css"

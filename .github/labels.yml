@@ -1,0 +1,22 @@
+labels:
+  - name: bug
+    color: d73a4a
+    description: "出现错误或异常行为"
+  - name: enhancement
+    color: a2eeef
+    description: "功能改进 / 新功能"
+  - name: documentation
+    color: 0075ca
+    description: "文档相关"
+  - name: good first issue
+    color: 7057ff
+    description: "适合新手的任务"
+  - name: help wanted
+    color: 008672
+    description: "需要志愿者帮助"
+  - name: question
+    color: d876e3
+    description: "有问题需要讨论"
+  - name: security
+    color: b60205
+    description: "安全报告（请私下联系维护者）"

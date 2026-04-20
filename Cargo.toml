@@ -1,0 +1,14 @@
+[workspace]
+members = [
+    "lang-core",
+    "lang-framework",
+    "lang-parser",
+    "lang-impl",
+    "lang-cli",
+]
+resolver = "3"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["FleetingLore <macro__9@outlook.com>"]
