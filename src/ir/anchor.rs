@@ -11,4 +11,7 @@ pub enum Anchor {
         name: String,
         url: String,
     },
+    Comment {
+        content: String,
+    },
 }

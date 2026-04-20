@@ -11,3 +11,7 @@ paragraph
 example link >>> https://www.example.com
 
 example link but escape \>>> https://www.example.com
+
+% some comment
+
+\% not a comment

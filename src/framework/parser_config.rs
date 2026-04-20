@@ -11,12 +11,16 @@ struct TomlConfig {
 struct ParserTable {
     pub url_link_key: Option<String>,
     pub url_link_key_escape: Option<String>,
+    pub comment_key: Option<String>,
+    pub comment_key_escape: Option<String>,
 }
 
 #[derive(Debug, Clone)]
 pub struct ParserConfig {
     pub url_link_key: String,
     pub url_link_key_escape: String,
+    pub comment_key: String,
+    pub comment_key_escape: String,
 }
 
 impl ParserConfig {
@@ -26,6 +30,8 @@ impl ParserConfig {
         let parser = toml_config.parser.unwrap_or(ParserTable {
             url_link_key: None,
             url_link_key_escape: None,
+            comment_key: None,
+            comment_key_escape: None,
         });
 
         Ok(Self {
@@ -33,6 +39,10 @@ impl ParserConfig {
             url_link_key_escape: parser
                 .url_link_key_escape
                 .unwrap_or_else(|| "\\|".to_string()),
+            comment_key: parser.comment_key.unwrap_or_else(|| "%".to_string()),
+            comment_key_escape: parser
+                .comment_key_escape
+                .unwrap_or_else(|| "\\%".to_string()),
         })
     }
 
@@ -46,6 +56,8 @@ impl Default for ParserConfig {
         Self {
             url_link_key: "|".to_string(),
             url_link_key_escape: "\\|".to_string(),
+            comment_key: "%".to_string(),
+            comment_key_escape: "\\%".to_string(),
         }
     }
 }

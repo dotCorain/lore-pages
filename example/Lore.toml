@@ -1,6 +1,8 @@
 [parser]
 url_link_key_escape = "\\>>>"
 url_link_key = ">>>"
+comment_key = "%"
+comment_key_escape = "\\%"
 
 [renderer]
 from_lore_path = "./lore_src"

@@ -18,6 +18,10 @@ impl Parser for MarkdownParser {
         for line in input.lines() {
             if let Some((level, content)) = parse_heading(line) {
                 doc.push(Anchor::Heading { level, content });
+            } else if let Some(comment_content) = parse_comment(line, parser_config) {
+                doc.push(Anchor::Comment {
+                    content: comment_content,
+                });
             } else if let Some((name, url)) = parse_url_link(line, parser_config) {
                 doc.push(Anchor::UrlLink { name, url });
             } else {
@@ -26,6 +30,12 @@ impl Parser for MarkdownParser {
                     content = content.replace(
                         &parser_config.url_link_key_escape,
                         &parser_config.url_link_key,
+                    );
+                }
+                if !parser_config.comment_key_escape.is_empty() {
+                    content = content.replace(
+                        &parser_config.comment_key_escape,
+                        &parser_config.comment_key,
                     );
                 }
 
@@ -92,6 +102,34 @@ pub fn parse_url_link(
         }
 
         Some((name, url))
+    } else {
+        None
+    }
+}
+
+pub fn parse_comment(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<String> {
+    let key = &parser_config.comment_key;
+    if key.is_empty() {
+        return None;
+    }
+
+    // require marker at start of line followed by a space: '% ' for example
+    let sep = format!("{} ", key);
+    if line.starts_with(&sep) {
+        let mut content = line[sep.len()..].to_string();
+
+        // unescape any escaped comment key occurrences (e.g. "\\%" -> "%")
+        if !parser_config.comment_key_escape.is_empty() {
+            content = content.replace(
+                &parser_config.comment_key_escape,
+                &parser_config.comment_key,
+            );
+        }
+
+        Some(content)
     } else {
         None
     }

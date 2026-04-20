@@ -60,6 +60,9 @@ fn render_node(node: &Anchor) -> String {
                 "  <p style=\"margin-left: 20px\"><a href=\"{url}\" class=\"link_url\">{name}</a></p>"
             )
         }
+        Anchor::Comment { content } => {
+            format!("  <!-- {} -->", content)
+        }
     }
 }
 
