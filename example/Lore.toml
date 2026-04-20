@@ -1,14 +1,16 @@
 [parser]
 url_link_key_escape = "\\>>>"
 url_link_key = ">>>"
+lore_link_key = "="
+lore_link_key_escape = "\\="
 comment_key = "%"
 comment_key_escape = "\\%"
 breakline_key = "---"
 breakline_key_escape = "\\---"
-
 
 [renderer]
 from_lore_path = "./lore_src"
 to_html_path = "./docs"
 css_url = "../style.css"
 lang = "zh-CN"
+link_base = "https://fleetinglore.github.io/index"

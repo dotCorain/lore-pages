@@ -13,6 +13,7 @@ pub struct RendererTable {
     pub to_html_path: Option<String>,
     pub css_url: Option<String>,
     pub lang: Option<String>,
+    pub link_base: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -21,6 +22,7 @@ pub struct RenderConfig {
     pub to_html_path: String,
     pub css_url: String,
     pub main_lang: String,
+    pub link_base: String,
 }
 
 impl RenderConfig {
@@ -38,6 +40,7 @@ impl RenderConfig {
                 .unwrap_or_else(|| "./html".to_string()),
             css_url: renderer.css_url.unwrap_or_else(|| "style.css".to_string()),
             main_lang: renderer.lang.unwrap_or_else(|| "en-US".to_string()),
+            link_base: renderer.link_base.unwrap_or_default(),
         })
     }
 
@@ -53,6 +56,7 @@ impl Default for RenderConfig {
             to_html_path: "./html".to_string(),
             css_url: "style.css".to_string(),
             main_lang: "en-US".to_string(),
+            link_base: "".to_string(),
         }
     }
 }

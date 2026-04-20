@@ -14,16 +14,10 @@ use std::path::Path;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 尝试从 `Lore.toml` 加载渲染配置，失败则回退到默认配置
     let renderer_config = match RenderConfig::from_file("Lore.toml") {
-        Ok(cfg) => {
-            println!(
-                "✓ 已加载配置: from_lore_path={}, to_html_path={}",
-                cfg.from_lore_path, cfg.to_html_path
-            );
-            cfg
-        }
+        Ok(cfg) => cfg,
         Err(e) => {
-            eprintln!("⚠ 配置加载失败: {}", e);
-            eprintln!("  使用默认配置");
+            eprintln!("Failed to load Lore.toml: {}", e);
+            eprintln!("using default configuration.");
             RenderConfig::default()
         }
     };

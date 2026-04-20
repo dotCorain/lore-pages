@@ -102,23 +102,6 @@ a:hover {
     border-bottom-color: #05aa6d;
 }
 
-/*
-.title {
-    color: #020090;
-    font-size: 25px;
-    padding-top: 12px;
-    border-top: 2px solid #f3f3f3;
-}
-
-.title:hover {
-    background-color: #f3f3f3;
-    border-top-color: #00d0d0;
-    border-top-style: dashed;
-    transition: border-color 0.2s ease;
-}
-
-
-
 .link_lore {
     color: #009090;
     border-bottom: 2px inset transparent;
@@ -128,7 +111,3 @@ a:hover {
 .link_lore:hover {
     border-bottom-color: #009090;
 }
-
-
-
-*/

@@ -7,6 +7,7 @@ pub enum Anchor {
     Paragraph {
         content: String,
     },
+    EmptyLine,
     BreakLine,
     PlaceHolderLine {
         content: String,
@@ -14,6 +15,10 @@ pub enum Anchor {
     UrlLink {
         name: String,
         url: String,
+    },
+    LoreLink {
+        name: String,
+        path: String,
     },
     Comment {
         content: String,

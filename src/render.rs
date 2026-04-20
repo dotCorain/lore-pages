@@ -34,7 +34,7 @@ impl Renderer for HtmlRenderer {
 
         // 逐个渲染 Anchor 节点并追加到输出字符串
         for node in &doc.nodes {
-            html.push_str(&render_node(node));
+            html.push_str(&render_node(node, renderer_config));
             html.push('\n');
         }
 
@@ -45,7 +45,10 @@ impl Renderer for HtmlRenderer {
     }
 }
 
-fn render_node(node: &Anchor) -> String {
+fn render_node(
+    node: &Anchor,
+    renderer_config: &RenderConfig,
+) -> String {
     match node {
         Anchor::Heading { level, content } => {
             let tag = format!("h{}", level);
@@ -64,9 +67,32 @@ fn render_node(node: &Anchor) -> String {
             // 占位符行不输出任何内容
             String::new()
         }
+        Anchor::EmptyLine => "".to_string(),
         Anchor::UrlLink { name, url } => {
             format!(
-                "  <p style=\"margin-left: 20px\"><a href=\"{url}\" class=\"link_url\">{name}</a></p>"
+                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_url\">{}</a></p>",
+                escape_html(url),
+                escape_html(name)
+            )
+        }
+        Anchor::LoreLink { name, path } => {
+            let href = if renderer_config.link_base.is_empty() {
+                path.clone()
+            } else {
+                // if path is absolute URL, do not prepend
+                if path.starts_with("http://") || path.starts_with("https://") {
+                    path.clone()
+                } else {
+                    let base = renderer_config.link_base.trim_end_matches('/');
+                    let p = path.trim_start_matches('/');
+                    format!("{}/{}", base, p)
+                }
+            };
+
+            format!(
+                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_lore\">{}</a></p>",
+                escape_html(&href),
+                escape_html(name)
             )
         }
         Anchor::Comment { content } => {

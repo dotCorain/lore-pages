@@ -17,6 +17,8 @@ struct ParserTable {
     // 如果某个键缺失，代码会在后面使用默认值代替
     pub url_link_key: Option<String>,
     pub url_link_key_escape: Option<String>,
+    pub lore_link_key: Option<String>,
+    pub lore_link_key_escape: Option<String>,
     pub comment_key: Option<String>,
     pub comment_key_escape: Option<String>,
     pub placeholder_key_escape: Option<String>,
@@ -29,6 +31,8 @@ pub struct ParserConfig {
     // 运行时使用的实际设置，使用 `String`（拥有所有权）保存值
     pub url_link_key: String,
     pub url_link_key_escape: String,
+    pub lore_link_key: String,
+    pub lore_link_key_escape: String,
     pub comment_key: String,
     pub comment_key_escape: String,
     pub placeholder_key_escape: String,
@@ -51,6 +55,8 @@ impl ParserConfig {
         let parser = toml_config.parser.unwrap_or(ParserTable {
             url_link_key: None,
             url_link_key_escape: None,
+            lore_link_key: None,
+            lore_link_key_escape: None,
             comment_key: None,
             comment_key_escape: None,
             placeholder_key_escape: None,
@@ -62,20 +68,14 @@ impl ParserConfig {
         // `unwrap_or_else(|| "...".to_string())` 只有在 Option 为 None 时才执行闭包并返回默认字符串
         Ok(Self {
             url_link_key: parser.url_link_key.unwrap_or_else(|| "|".to_string()),
-            url_link_key_escape: parser
-                .url_link_key_escape
-                .unwrap_or_else(|| "\\|".to_string()),
+            url_link_key_escape: parser.url_link_key_escape.unwrap_or_default(),
+            lore_link_key: parser.lore_link_key.unwrap_or_else(|| "=".to_string()),
+            lore_link_key_escape: parser.lore_link_key_escape.unwrap_or_default(),
             comment_key: parser.comment_key.unwrap_or_else(|| "%".to_string()),
-            comment_key_escape: parser
-                .comment_key_escape
-                .unwrap_or_else(|| "\\%".to_string()),
-            placeholder_key_escape: parser
-                .placeholder_key_escape
-                .unwrap_or_else(|| "\\_".to_string()),
+            comment_key_escape: parser.comment_key_escape.unwrap_or_default(),
+            placeholder_key_escape: parser.placeholder_key_escape.unwrap_or_default(),
             breakline_key: parser.breakline_key.unwrap_or_else(|| "---".to_string()),
-            breakline_key_escape: parser
-                .breakline_key_escape
-                .unwrap_or_else(|| "\\---".to_string()),
+            breakline_key_escape: parser.breakline_key_escape.unwrap_or_default(),
         })
     }
 
@@ -91,12 +91,14 @@ impl Default for ParserConfig {
         // `to_string()` 将字符串字面量转换为 `String`（堆分配）
         Self {
             url_link_key: "|".to_string(),
-            url_link_key_escape: "\\|".to_string(),
+            url_link_key_escape: "".to_string(),
+            lore_link_key: "=".to_string(),
+            lore_link_key_escape: "".to_string(),
             comment_key: "%".to_string(),
-            comment_key_escape: "\\%".to_string(),
-            placeholder_key_escape: "\\_".to_string(),
+            comment_key_escape: "".to_string(),
+            placeholder_key_escape: "".to_string(),
             breakline_key: "---".to_string(),
-            breakline_key_escape: "\\---".to_string(),
+            breakline_key_escape: "".to_string(),
         }
     }
 }

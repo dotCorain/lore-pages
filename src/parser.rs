@@ -28,14 +28,30 @@ impl Parser for MarkdownParser {
                 doc.push(Anchor::Comment {
                     content: comment_content,
                 });
-            } else if let Some((name, url)) = parse_url_link(line, parser_config) {
+            } else if let Some((name, url)) = parse_binary(
+                line,
+                &parser_config.url_link_key,
+                &parser_config.url_link_key_escape,
+            ) {
                 doc.push(Anchor::UrlLink { name, url });
+            } else if let Some((name, path)) = parse_binary(
+                line,
+                &parser_config.lore_link_key,
+                &parser_config.lore_link_key_escape,
+            ) {
+                doc.push(Anchor::LoreLink { name, path });
             } else {
                 let mut content = line.to_string();
                 if !parser_config.url_link_key_escape.is_empty() {
                     content = content.replace(
                         &parser_config.url_link_key_escape,
                         &parser_config.url_link_key,
+                    );
+                }
+                if !parser_config.lore_link_key_escape.is_empty() {
+                    content = content.replace(
+                        &parser_config.lore_link_key_escape,
+                        &parser_config.lore_link_key,
                     );
                 }
                 if !parser_config.comment_key_escape.is_empty() {
@@ -50,7 +66,7 @@ impl Parser for MarkdownParser {
 
                 // skip truly empty lines (or lines with only whitespace)
                 if content.trim().is_empty() {
-                    // do not push an empty paragraph (no automatic <br>)
+                    doc.push(Anchor::EmptyLine);
                 } else {
                     doc.push(Anchor::Paragraph { content });
                 }
@@ -89,33 +105,39 @@ pub fn parse_url_link(
     line: &str,
     parser_config: &ParserConfig,
 ) -> Option<(String, String)> {
-    let key = &parser_config.url_link_key;
+    // kept for compatibility but replaced by `parse_binary`
+    parse_binary(
+        line,
+        &parser_config.url_link_key,
+        &parser_config.url_link_key_escape,
+    )
+}
+
+pub fn parse_binary(
+    line: &str,
+    key: &str,
+    key_escape: &str,
+) -> Option<(String, String)> {
     if key.is_empty() {
         return None;
     }
 
-    // require spaces around the key: 'name <space> key <space> url'
+    // require spaces around the key: 'name <space> key <space> value'
     let sep = format!(" {} ", key);
     if let Some(pos) = line.find(&sep) {
         let left = &line[..pos];
         let right = &line[pos + sep.len()..];
 
         let mut name = left.trim().to_string();
-        let mut url = right.trim().to_string();
+        let mut value = right.trim().to_string();
 
-        // unescape any escaped key occurrences (e.g. "\|" -> "|")
-        if !parser_config.url_link_key_escape.is_empty() {
-            name = name.replace(
-                &parser_config.url_link_key_escape,
-                &parser_config.url_link_key,
-            );
-            url = url.replace(
-                &parser_config.url_link_key_escape,
-                &parser_config.url_link_key,
-            );
+        // unescape any escaped key occurrences (e.g. "\\=" -> "=")
+        if !key_escape.is_empty() {
+            name = name.replace(key_escape, key);
+            value = value.replace(key_escape, key);
         }
 
-        Some((name, url))
+        Some((name, value))
     } else {
         None
     }
@@ -157,11 +179,7 @@ pub fn parse_placeholder(
 
     if parser_config.placeholder_key_escape.is_empty() {
         if line.starts_with(marker) {
-            let content = if line.len() > marker.len() {
-                line[marker.len()..].to_string()
-            } else {
-                String::new()
-            };
+            let content = line.strip_prefix(marker).unwrap_or("").to_string();
             Some(content)
         } else {
             None
@@ -172,11 +190,7 @@ pub fn parse_placeholder(
             // escaped marker at start -> not a placeholder
             None
         } else if line.starts_with(marker) {
-            let content = if line.len() > marker.len() {
-                line[marker.len()..].to_string()
-            } else {
-                String::new()
-            };
+            let content = line.strip_prefix(marker).unwrap_or("").to_string();
             Some(content)
         } else {
             None
