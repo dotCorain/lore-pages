@@ -85,7 +85,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use lang_core::{Category, Anchor};
+    use lang_core::{Anchor, Category};
 
     struct TestParser;
     impl Parser for TestParser {

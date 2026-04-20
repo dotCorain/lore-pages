@@ -1,11 +1,5 @@
 [workspace]
-members = [
-    "lang-core",
-    "lang-framework",
-    "lang-parser",
-    "lang-impl",
-    "lang-cli",
-]
+members = ["lang", "framework", "cli"]
 resolver = "3"
 
 [workspace.package]

@@ -1,6 +1,6 @@
 //! Markdown 解析器的具体实现
 
-use lang_core::{Category, Anchor};
+use lang_core::{Anchor, Category};
 use lang_framework::Parser;
 
 /// 解析标题行

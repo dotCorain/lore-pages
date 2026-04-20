@@ -1,6 +1,6 @@
 //! HTML 渲染器的具体实现
 
-use lang_core::{Category, Anchor};
+use lang_core::{Anchor, Category};
 use lang_framework::Renderer;
 
 /// `HtmlRenderer` — 将 `lang_core::Category` 渲染为完整的 HTML 页面实现。
