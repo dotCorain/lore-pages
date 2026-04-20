@@ -84,6 +84,24 @@ h4:hover {
     transition: border-color 0.2s ease;
 }
 
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+.link_url {
+    color: #05aa6d;
+    border-bottom: 2px inset transparent;
+    transition: border-color 0.2s ease;
+}
+
+.link_url:hover {
+    border-bottom-color: #05aa6d;
+}
+
 /*
 .title {
     color: #020090;
@@ -99,13 +117,7 @@ h4:hover {
     transition: border-color 0.2s ease;
 }
 
-a {
-    text-decoration: none;
-}
 
-a:hover {
-    opacity: 0.8;
-}
 
 .link_lore {
     color: #009090;
@@ -117,14 +129,6 @@ a:hover {
     border-bottom-color: #009090;
 }
 
-.link_html {
-    color: #05aa6d;
-    border-bottom: 2px inset transparent;
-    transition: border-color 0.2s ease;
-}
 
-.link_html:hover {
-    border-bottom-color: #05aa6d;
-}
 
 */

@@ -1,12 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 pub struct CategoryConfig {}
 
 impl CategoryConfig {}
-
-impl Default for CategoryConfig {
-    fn default() -> Self {
-        Self {}
-    }
-}

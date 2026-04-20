@@ -1,7 +1,9 @@
 [parser]
+url_link_key_escape = "\\>>>"
+url_link_key = ">>>"
 
 [renderer]
 from_lore_path = "./lore_src"
 to_html_path = "./docs"
 css_url = "../style.css"
-lang = "zh-CH"
+lang = "zh-CN"

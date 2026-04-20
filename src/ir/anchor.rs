@@ -7,4 +7,8 @@ pub enum Anchor {
     Paragraph {
         content: String,
     },
+    UrlLink {
+        name: String,
+        url: String,
+    },
 }
