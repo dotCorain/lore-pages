@@ -26,9 +26,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let src_dir = Path::new(&renderer_config.from_lore_path);
     let dst_dir = Path::new(&renderer_config.to_html_path);
 
-    // Create default configs
+    // Create configs (parser config may be loaded from Lore.toml)
     let category_config = CategoryConfig::default();
-    let parser_config = ParserConfig::default();
+    let parser_config = ParserConfig::from_file_or_default("Lore.toml");
 
     let parser = MarkdownParser;
     let renderer = HtmlRenderer;

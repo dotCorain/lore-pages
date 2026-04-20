@@ -55,6 +55,11 @@ fn render_node(node: &Anchor) -> String {
                 format!("  <p>{}</p>", escape_html(content))
             }
         }
+        Anchor::UrlLink { name, url } => {
+            format!(
+                "  <p style=\"margin-left: 20px\"><a href=\"{url}\" class=\"link_url\">{name}</a></p>"
+            )
+        }
     }
 }
 
