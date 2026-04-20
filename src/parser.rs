@@ -4,6 +4,8 @@ use crate::framework::parser_config::ParserConfig;
 use crate::ir::anchor::Anchor;
 use crate::ir::category::Category;
 
+// 解析器实现：将 lore 文本逐行解析成中间表示 `Category`（由 `Anchor` 节点组成）
+
 pub struct MarkdownParser;
 
 impl Parser for MarkdownParser {

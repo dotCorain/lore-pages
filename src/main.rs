@@ -4,10 +4,15 @@ use lore_pages::framework::parser_config::ParserConfig;
 use lore_pages::framework::renderer_config::RenderConfig;
 use lore_pages::parser::MarkdownParser;
 use lore_pages::render::HtmlRenderer;
+// 标准库：文件读写与路径处理
 use std::fs;
 use std::path::Path;
 
+// 程序入口
+// 返回 `Result<(), Box<dyn std::error::Error>>`：
+// - `Box<dyn std::error::Error>` 是一个“装箱”的 trait 对象，用来统一不同错误类型，便于主函数返回各种可能的错误
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // 尝试从 `Lore.toml` 加载渲染配置，失败则回退到默认配置
     let renderer_config = match RenderConfig::from_file("Lore.toml") {
         Ok(cfg) => {
             println!(
@@ -26,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let src_dir = Path::new(&renderer_config.from_lore_path);
     let dst_dir = Path::new(&renderer_config.to_html_path);
 
-    // Create configs (parser config may be loaded from Lore.toml)
+    // 创建配置
     let category_config = CategoryConfig::default();
     let parser_config = ParserConfig::from_file_or_default("Lore.toml");
 
@@ -41,12 +46,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &parser_config,
     );
 
+    // 将源目录递归转换到目标目录
     convert_directory(&converter, src_dir, dst_dir)?;
 
     println!("done.");
     Ok(())
 }
 
+// 递归转换目录：
+// - `'a` 是转换器生命周期，`P`/`R` 是泛型，绑定到 `Parser`/`Renderer` trait
+// - 使用 `?` 运算符将 I/O 错误向上传播，函数返回 `std::io::Result<()>`
 fn convert_directory<'a, P, R>(
     converter: &CategoryConverter<'a, P, R>,
     src_dir: &Path,
@@ -89,6 +98,8 @@ where
 }
 
 fn is_lore_file(path: &Path) -> bool {
+    // 判断扩展名是否为 "lore"
+    // `extension()` 返回 `Option<OsStr>`，后面链式转换为 `Option<&str>` 再判断是否等于 "lore"
     path.extension()
         .and_then(|e| e.to_str())
         .map(|e| e == "lore")

@@ -3,6 +3,8 @@ use crate::framework::renderer::Renderer;
 use crate::framework::renderer_config::RenderConfig;
 use crate::ir::anchor::Anchor;
 use crate::ir::category::Category;
+
+// 渲染器实现：将 IR（Category/Anchor）转换为 HTML 字符串
 pub struct HtmlRenderer;
 
 impl Renderer for HtmlRenderer {
@@ -30,6 +32,7 @@ impl Renderer for HtmlRenderer {
         html.push_str("</head>\n");
         html.push_str("<body>\n");
 
+        // 逐个渲染 Anchor 节点并追加到输出字符串
         for node in &doc.nodes {
             html.push_str(&render_node(node));
             html.push('\n');
@@ -58,7 +61,7 @@ fn render_node(node: &Anchor) -> String {
         }
         Anchor::BreakLine => "  <br>".to_string(),
         Anchor::PlaceHolderLine { .. } => {
-            // placeholder lines do not render any output
+            // 占位符行不输出任何内容
             String::new()
         }
         Anchor::UrlLink { name, url } => {
