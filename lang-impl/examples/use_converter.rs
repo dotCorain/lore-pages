@@ -1,24 +1,24 @@
 //! 示例：使用 Converter
 
-use lang_core::{Document, Node};
+use lang_core::{Category, Anchor};
 use lang_framework::{Converter, Parser, Renderer};
 
 // 一个简单的解析器（只识别标题）
 struct SimpleParser;
 
 impl Parser for SimpleParser {
-    fn parse(&self, input: &str) -> Document {
-        let mut doc = Document::new();
+    fn parse(&self, input: &str) -> Category {
+        let mut doc = Category::new();
         for line in input.lines() {
             if line.starts_with("# ") {
                 if let Some(content) = line.strip_prefix("# ") {
-                    doc.push(Node::Heading {
+                    doc.push(Anchor::Heading {
                         level: 1,
                         content: content.to_string(),
                     });
                 }
             } else if !line.is_empty() {
-                doc.push(Node::Paragraph {
+                doc.push(Anchor::Paragraph {
                     content: line.to_string(),
                 });
             }
@@ -31,14 +31,14 @@ impl Parser for SimpleParser {
 struct SimpleRenderer;
 
 impl Renderer for SimpleRenderer {
-    fn render(&self, doc: &Document, title: &str, _css_url: &str) -> String {
+    fn render(&self, doc: &Category, title: &str, _css_url: &str) -> String {
         let mut output = format!("=== {} ===\n\n", title);
         for node in &doc.nodes {
             match node {
-                Node::Heading { level, content } => {
+                Anchor::Heading { level, content } => {
                     output.push_str(&format!("{}. {}\n", level, content));
                 }
-                Node::Paragraph { content } => {
+                Anchor::Paragraph { content } => {
                     output.push_str(&format!("[P] {}\n", content));
                 }
             }

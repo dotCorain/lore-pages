@@ -1,6 +1,6 @@
 //! 示例：基本的解析功能
 
-use lang_core::Node;
+use lang_core::Anchor;
 use lang_framework::Parser;
 use lang_parser::MarkdownParser;
 
@@ -37,10 +37,10 @@ let doc = parser.parse(\"# Hello\");
     for (i, node) in doc.nodes.iter().enumerate() {
         print!("{:2}. ", i + 1);
         match node {
-            Node::Heading { level, content } => {
+            Anchor::Heading { level, content } => {
                 println!("[H{}] {}", level, content);
             }
-            Node::Paragraph { content } => {
+            Anchor::Paragraph { content } => {
                 // 截断过长的内容
                 let display = if content.len() > 60 {
                     format!("{}...", &content[..57])

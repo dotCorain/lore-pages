@@ -10,20 +10,20 @@ use crate::{Config, Parser, Renderer};
 ///
 /// ```
 /// use lang_framework::{Converter, Parser, Renderer};
-/// use lang_core::{Document, Node};
+/// use lang_core::{Category, Anchor};
 ///
 /// struct MyParser;
 /// impl Parser for MyParser {
-///     fn parse(&self, input: &str) -> Document {
-///         let mut doc = Document::new();
-///         doc.push(Node::Paragraph { content: input.to_string() });
+///     fn parse(&self, input: &str) -> Category {
+///         let mut doc = Category::new();
+///         doc.push(Anchor::Paragraph { content: input.to_string() });
 ///         doc
 ///     }
 /// }
 ///
 /// struct MyRenderer;
 /// impl Renderer for MyRenderer {
-///     fn render(&self, doc: &Document, title: &str, css_url: &str) -> String {
+///     fn render(&self, doc: &Category, title: &str, css_url: &str) -> String {
 ///         format!("<html><title>{}</title><body>{:?}</body></html>", title, doc)
 ///     }
 /// }
@@ -85,13 +85,13 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use lang_core::{Document, Node};
+    use lang_core::{Category, Anchor};
 
     struct TestParser;
     impl Parser for TestParser {
-        fn parse(&self, input: &str) -> Document {
-            let mut doc = Document::new();
-            doc.push(Node::Paragraph {
+        fn parse(&self, input: &str) -> Category {
+            let mut doc = Category::new();
+            doc.push(Anchor::Paragraph {
                 content: input.to_string(),
             });
             doc
@@ -100,7 +100,7 @@ mod tests {
 
     struct TestRenderer;
     impl Renderer for TestRenderer {
-        fn render(&self, doc: &Document, title: &str, css_url: &str) -> String {
+        fn render(&self, doc: &Category, title: &str, css_url: &str) -> String {
             format!(
                 "<!DOCTYPE html><html><head><title>{}</title><link href='{}'></head><body>{:?}</body></html>",
                 title, css_url, doc

@@ -1,22 +1,22 @@
 //! 示例：如何遍历文档中的节点
 
-use lang_core::{Document, Node};
+use lang_core::{Category, Anchor};
 
 fn main() {
-    let mut doc = Document::new();
+    let mut doc = Category::new();
 
-    doc.push(Node::Heading {
+    doc.push(Anchor::Heading {
         level: 1,
         content: "文档".to_string(),
     });
-    doc.push(Node::Paragraph {
+    doc.push(Anchor::Paragraph {
         content: "第一段".to_string(),
     });
-    doc.push(Node::Heading {
+    doc.push(Anchor::Heading {
         level: 2,
         content: "章节".to_string(),
     });
-    doc.push(Node::Paragraph {
+    doc.push(Anchor::Paragraph {
         content: "第二段".to_string(),
     });
 
@@ -31,7 +31,7 @@ fn main() {
     let heading_count = doc
         .nodes
         .iter()
-        .filter(|node| matches!(node, Node::Heading { .. }))
+        .filter(|node| matches!(node, Anchor::Heading { .. }))
         .count();
     println!("  标题数量: {}", heading_count);
 
@@ -41,7 +41,7 @@ fn main() {
         .nodes
         .iter()
         .filter_map(|node| {
-            if let Node::Heading { content, .. } = node {
+            if let Anchor::Heading { content, .. } = node {
                 Some(content.as_str())
             } else {
                 None

@@ -1,76 +1,76 @@
 //! IR 定义模块
 
-/// 文档节点类型
+/// Anchor Types
 ///
-/// 每个节点代表文档中的一个元素，比如标题或段落。
-///
-/// # 示例
+/// Each Anchor means a line, such as a title or a paragraph.
+/// 
+/// For example:
 ///
 /// ```
-/// use lang_core::Node;
+/// use lang_core::Anchor;
 ///
-/// let heading = Node::Heading {
+/// let heading = Anchor::Heading {
 ///     level: 2,
-///     content: "这是二级标题".to_string(),
+///     content: "Some 2 Level Title".to_string(),
 /// };
 ///
-/// let paragraph = Node::Paragraph {
-///     content: "这是普通段落。".to_string(),
+/// let paragraph = Anchor::Paragraph {
+///     content: "Some commen peregraph.".to_string(),
 /// };
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-pub enum Node {
-    /// 标题节点
+pub enum Anchor {
+    /// Title Anchor
     ///
-    /// `level` 的取值范围是 1-4，对应 Markdown 中的 #、##、###、####
+    /// `level` should less than 4 and more than 1.
     Heading {
-        /// 标题级别：1 到 4
+        /// title level: from 1 to 4
         level: u8,
-        /// 标题的文本内容
+        /// content in title
         content: String,
     },
-    /// 段落节点
+    /// Paragraph Anchor
     ///
-    /// 普通的文本段落
+    /// common text
     Paragraph {
-        /// 段落的文本内容
+        /// content in the text
         content: String,
     },
 }
 
-/// 整个文档
+/// Category Types
 ///
-/// `Document` 是一个包含多个 `Node` 的容器。
+/// `Category` 是一个包含多个 `Anchor` 的容器。
 ///
-/// # 示例
+/// For Example
 ///
 /// ```
-/// use lang_core::{Document, Node};
+/// use lang_core::{Category, Anchor};
 ///
-/// let mut doc = Document::new();
-/// doc.nodes.push(Node::Heading {
+/// let mut doc = Category::new();
+/// doc.nodes.push(Anchor::Heading {
 ///     level: 1,
-///     content: "我的文档".to_string(),
+///     content: "Some File".to_string(),
 /// });
-/// doc.nodes.push(Node::Paragraph {
-///     content: "欢迎阅读我的文档。".to_string(),
+/// doc.nodes.push(Anchor::Paragraph {
+///     content: "Welcome!".to_string(),
 /// });
 ///
 /// assert_eq!(doc.nodes.len(), 2);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq)]
-pub struct Document {
-    pub nodes: Vec<Node>,
+pub struct Category {
+    pub nodes: Vec<Anchor>,
 }
 
-impl Document {
+impl Category {
     /// 创建一个新的空文档
     pub fn new() -> Self {
         Self { nodes: Vec::new() }
     }
 
     /// 添加一个节点到文档末尾
-    pub fn push(&mut self, node: Node) {
+    pub fn push(&mut self, node: Anchor) {
         self.nodes.push(node);
     }
 
@@ -91,15 +91,15 @@ mod tests {
 
     #[test]
     fn test_new_document_is_empty() {
-        let doc = Document::new();
+        let doc = Category::new();
         assert!(doc.is_empty());
         assert_eq!(doc.len(), 0);
     }
 
     #[test]
     fn test_push_node() {
-        let mut doc = Document::new();
-        doc.push(Node::Heading {
+        let mut doc = Category::new();
+        doc.push(Anchor::Heading {
             level: 1,
             content: "Title".to_string(),
         });
@@ -109,13 +109,13 @@ mod tests {
 
     #[test]
     fn test_heading_node() {
-        let heading = Node::Heading {
+        let heading = Anchor::Heading {
             level: 3,
             content: "Hello".to_string(),
         };
 
         match heading {
-            Node::Heading { level, content } => {
+            Anchor::Heading { level, content } => {
                 assert_eq!(level, 3);
                 assert_eq!(content, "Hello");
             }
@@ -125,12 +125,12 @@ mod tests {
 
     #[test]
     fn test_paragraph_node() {
-        let paragraph = Node::Paragraph {
+        let paragraph = Anchor::Paragraph {
             content: "Some text".to_string(),
         };
 
         match paragraph {
-            Node::Paragraph { content } => {
+            Anchor::Paragraph { content } => {
                 assert_eq!(content, "Some text");
             }
             _ => panic!("Expected paragraph node"),

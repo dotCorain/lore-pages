@@ -1,6 +1,6 @@
 //! Markdown 解析器的具体实现
 
-use lang_core::{Document, Node};
+use lang_core::{Category, Anchor};
 use lang_framework::Parser;
 
 /// 解析标题行
@@ -22,7 +22,7 @@ use lang_framework::Parser;
 /// Markdown 解析器 — 一个非常简化的 Markdown 实现。
 ///
 /// 实现了 `lang_framework::Parser` trait，将 Markdown 文本逐行解析为
-/// `lang_core::Document`（由 `Node` 构成的节点序列）。
+/// `lang_core::Category`（由 `Anchor` 构成的节点序列）。
 ///
 /// 目前实现仅支持：标题（1-4 级，格式须为 `# ` 后跟空格）和单行段落。
 ///
@@ -48,16 +48,16 @@ impl Parser for MarkdownParser {
     ///    - 空行会被忽略
     ///
     /// 注意：这是一个简化实现，真正的 Markdown 需要考虑多行段落、列表等。
-    fn parse(&self, input: &str) -> Document {
-        let mut doc = Document::new();
+    fn parse(&self, input: &str) -> Category {
+        let mut doc = Category::new();
 
         for line in input.lines() {
             // 不再跳过空行，空行也作为段落处理
             if let Some((level, content)) = parse_heading(line) {
-                doc.push(Node::Heading { level, content });
+                doc.push(Anchor::Heading { level, content });
             } else {
                 // 空行会变成内容为空的 Paragraph
-                doc.push(Node::Paragraph {
+                doc.push(Anchor::Paragraph {
                     content: line.to_string(),
                 });
             }
@@ -197,7 +197,7 @@ mod tests {
 
         assert_eq!(doc.nodes.len(), 1);
         match &doc.nodes[0] {
-            Node::Heading { level, content } => {
+            Anchor::Heading { level, content } => {
                 assert_eq!(*level, 1);
                 assert_eq!(content, "Hello World");
             }
@@ -221,7 +221,7 @@ mod tests {
         let expected_levels = [1, 2, 3, 4];
         for (i, node) in doc.nodes.iter().enumerate() {
             match node {
-                Node::Heading { level, .. } => {
+                Anchor::Heading { level, .. } => {
                     assert_eq!(*level, expected_levels[i]);
                 }
                 _ => panic!("Expected heading"),
@@ -237,7 +237,7 @@ mod tests {
         assert_eq!(doc.nodes.len(), 2);
         for node in &doc.nodes {
             match node {
-                Node::Paragraph { .. } => {}
+                Anchor::Paragraph { .. } => {}
                 _ => panic!("Expected paragraph"),
             }
         }
@@ -264,8 +264,8 @@ Final paragraph.";
             .nodes
             .iter()
             .map(|node| match node {
-                Node::Heading { .. } => "heading",
-                Node::Paragraph { .. } => "paragraph",
+                Anchor::Heading { .. } => "heading",
+                Anchor::Paragraph { .. } => "paragraph",
             })
             .collect();
 
@@ -320,7 +320,7 @@ Paragraph after empty line
         let doc = parser.parse("# Title with trailing spaces   ");
 
         match &doc.nodes[0] {
-            Node::Heading { content, .. } => {
+            Anchor::Heading { content, .. } => {
                 // 注意：内容末尾的空格会被保留
                 assert_eq!(content, "Title with trailing spaces   ");
             }
@@ -334,7 +334,7 @@ Paragraph after empty line
         let doc = parser.parse("# This is # not a heading");
 
         match &doc.nodes[0] {
-            Node::Heading { content, .. } => {
+            Anchor::Heading { content, .. } => {
                 // 内容中的 # 应该保留
                 assert_eq!(content, "This is # not a heading");
             }
@@ -353,7 +353,7 @@ mod integration_tests {
     fn test_full_document() {
         let parser = MarkdownParser;
         let input = "\
-# My Document
+# My Category
 
 This is the introduction.
 
@@ -382,16 +382,16 @@ More content.";
 
         // 验证第一个节点是 H1
         match &doc.nodes[0] {
-            Node::Heading { level, content } => {
+            Anchor::Heading { level, content } => {
                 assert_eq!(*level, 1);
-                assert_eq!(content, "My Document");
+                assert_eq!(content, "My Category");
             }
             _ => panic!("First node should be heading"),
         }
 
         // 第二个节点应该是空段落（因为空行）
         match &doc.nodes[1] {
-            Node::Paragraph { content } => {
+            Anchor::Paragraph { content } => {
                 assert_eq!(content, "");
             }
             _ => panic!("Second node should be empty paragraph"),
@@ -401,7 +401,7 @@ More content.";
         let heading_count = doc
             .nodes
             .iter()
-            .filter(|node| matches!(node, Node::Heading { .. }))
+            .filter(|node| matches!(node, Anchor::Heading { .. }))
             .count();
         assert_eq!(heading_count, 5);
     }

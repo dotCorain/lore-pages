@@ -4,8 +4,8 @@
 
 主要组件
 
-- `Parser`（trait）：将输入文本解析为 `lang_core::Document`。
-- `Renderer`（trait）：将 `Document` 渲染为输出（例如 HTML）。
+- `Parser`（trait）：将输入文本解析为 `lang_core::Category`。
+- `Renderer`（trait）：将 `Category` 渲染为输出（例如 HTML）。
 - `Config`：从 TOML 文件加载配置（路径、输出目录、css 地址）。
 - `Converter`：组合 `Parser` 与 `Renderer`，提供一键转换接口。
 
@@ -15,20 +15,20 @@
 
 ```rust
 use lang_framework::{Converter, Parser, Renderer};
-use lang_core::{Document, Node};
+use lang_core::{Category, Anchor};
 
 struct MyParser;
 impl Parser for MyParser {
-	fn parse(&self, input: &str) -> Document {
-		let mut doc = Document::new();
-		doc.push(Node::Paragraph { content: input.to_string() });
+	fn parse(&self, input: &str) -> Category {
+		let mut doc = Category::new();
+		doc.push(Anchor::Paragraph { content: input.to_string() });
 		doc
 	}
 }
 
 struct MyRenderer;
 impl Renderer for MyRenderer {
-	fn render(&self, doc: &Document, title: &str, css_url: &str) -> String {
+	fn render(&self, doc: &Category, title: &str, css_url: &str) -> String {
 		format!("<html><head><title>{}</title></head><body>{:?}</body></html>", title, doc)
 	}
 }

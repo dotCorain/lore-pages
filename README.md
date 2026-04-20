@@ -4,7 +4,7 @@
 
 核心组件：
 
-- `lang-core`：定义文档的中间表示（IR），包含 `Document` 与 `Node`。
+- `lang-core`：定义文档的中间表示（IR），包含 `Category` 与 `Anchor`。
 - `lang-framework`：提供解析器/渲染器的 trait、配置加载与 `Converter` 组合器。
 - `lang-parser`：简化的 Markdown 解析器（支持 1-4 级标题与段落）。
 - `lang-impl`：HTML 渲染器实现（`HtmlRenderer`）。
@@ -48,7 +48,7 @@ css_url = "style.css"
 下面示例展示如何在项目中组合解析器与渲染器：
 
 ```rust
-use lang_core::{Document, Node};
+use lang_core::{Category, Anchor};
 use lang_parser::MarkdownParser;
 use lang_impl::HtmlRenderer;
 use lang_framework::Converter;

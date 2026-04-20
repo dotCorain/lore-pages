@@ -1,11 +1,11 @@
 # lang-impl
 
-`lang-impl` 提供 `HtmlRenderer`，用于将 `lang_core::Document` 渲染为完整的 HTML 页面。
+`lang-impl` 提供 `HtmlRenderer`，用于将 `lang_core::Category` 渲染为完整的 HTML 页面。
 
 行为说明
 
-- `Node::Heading` 渲染为对应的 `<hN>` 标签。
-- `Node::Paragraph` 渲染为 `<p>`；空段落渲染为 `<br>`。
+- `Anchor::Heading` 渲染为对应的 `<hN>` 标签。
+- `Anchor::Paragraph` 渲染为 `<p>`；空段落渲染为 `<br>`。
 - 生成基本文档头（`<head>`、`<title>`、`<link rel=stylesheet>` 等）。
 
 安全说明
@@ -15,12 +15,12 @@
 快速示例
 
 ```rust
-use lang_core::{Document, Node};
+use lang_core::{Category, Anchor};
 use lang_impl::HtmlRenderer;
 use lang_framework::Renderer;
 
-let mut doc = Document::new();
-doc.push(Node::Heading { level: 1, content: "标题".to_string() });
+let mut doc = Category::new();
+doc.push(Anchor::Heading { level: 1, content: "标题".to_string() });
 let renderer = HtmlRenderer;
 let html = renderer.render(&doc, "页面标题", "style.css");
 println!("{}", html);

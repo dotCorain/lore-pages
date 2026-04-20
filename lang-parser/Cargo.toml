@@ -7,8 +7,6 @@ edition = "2024"
 lang-core = { path = "../lang-core" }
 lang-framework = { path = "../lang-framework" }
 
-[dev-dependencies]
-
 [[example]]
 name = "parse_basic"
 path = "examples/parse_basic.rs"
@@ -16,9 +14,3 @@ path = "examples/parse_basic.rs"
 [[example]]
 name = "parse_file"
 path = "examples/parse_file.rs"
-
-[profile.release]
-opt-level = 3
-lto = "fat"
-codegen-units = 1
-strip = "symbols"

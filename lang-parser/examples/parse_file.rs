@@ -1,7 +1,7 @@
 //! 示例：解析文件中的 Markdown
 
-// 需要导入 Node 类型
-use lang_core::Node;
+// 需要导入 Anchor 类型
+use lang_core::Anchor;
 
 use std::fs;
 use std::path::PathBuf;
@@ -50,11 +50,11 @@ fn main() {
 
     for node in &doc.nodes {
         match node {
-            Node::Heading { level, content } => {
+            Anchor::Heading { level, content } => {
                 headings += 1;
                 println!("  H{}: {}", level, content);
             }
-            Node::Paragraph { content } => {
+            Anchor::Paragraph { content } => {
                 paragraphs += 1;
                 let preview = if content.len() > 50 {
                     format!("{}...", &content[..47])

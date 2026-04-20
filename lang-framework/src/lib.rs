@@ -4,8 +4,8 @@
 //! 以及配置加载和转换器。
 //!
 //! 简要说明：
-//! - `Parser`：将输入文本解析成 `lang_core::Document`。
-//! - `Renderer`：将 `Document` 渲染为输出（例如 HTML）。
+//! - `Parser`：将输入文本解析成 `lang_core::Category`。
+//! - `Renderer`：将 `Category` 渲染为输出（例如 HTML）。
 //! - `Config`：负责加载工具所需的配置（从 TOML 文件）。
 //! - `Converter`：组合 `Parser` 与 `Renderer`，提供一键转换接口。
 //!

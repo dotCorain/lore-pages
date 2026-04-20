@@ -5,24 +5,24 @@
 快速示例
 
 ```rust
-use lang_core::{Document, Node};
+use lang_core::{Category, Anchor};
 
-let mut doc = Document::new();
-doc.push(Node::Heading { level: 1, content: "标题".to_string() });
-doc.push(Node::Paragraph { content: "第一段内容".to_string() });
+let mut doc = Category::new();
+doc.push(Anchor::Heading { level: 1, content: "标题".to_string() });
+doc.push(Anchor::Paragraph { content: "第一段内容".to_string() });
 assert_eq!(doc.len(), 2);
 ```
 
 API 参考（常用）
 
-- `struct Document`:
-	- 字段: `nodes: Vec<Node>`
-	- `Document::new() -> Document`：创建空文档
-	- `push(&mut self, node: Node)`：在文档末尾添加节点
+- `struct Category`:
+	- 字段: `nodes: Vec<Anchor>`
+	- `Category::new() -> Category`：创建空文档
+	- `push(&mut self, node: Anchor)`：在文档末尾添加节点
 	- `is_empty(&self) -> bool`：是否为空文档
 	- `len(&self) -> usize`：节点数量
 
-- `enum Node`：
+- `enum Anchor`：
 	- `Heading { level: u8, content: String }`：标题节点，`level` 推荐范围 1-4
 	- `Paragraph { content: String }`：段落节点
 
