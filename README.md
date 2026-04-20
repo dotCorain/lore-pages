@@ -1,112 +1,25 @@
-# Lore Pages
+# Intro
 
-轻量级的多 crate Rust 项目，用于将简单的 Lore/Markdown 文档转换为 HTML。
+这个代码基本上是 AI 写的,为了防止过两天把东西都忘了,所以写了这个文件.
 
-核心组件：
+## src/ir
 
-- `lang-core`：定义文档的中间表示（IR），包含 `Category` 与 `Anchor`。
-- `lang-framework`：提供解析器/渲染器的 trait、配置加载与 `Converter` 组合器。
-- `lang-parser`：简化的 Markdown 解析器（支持 1-4 级标题与段落）。
-- `lang-impl`：HTML 渲染器实现（`HtmlRenderer`）。
-- `lang-cli`：命令行工具，组合解析器与渲染器以批量转换目录下的 `.lore` 文件。
+所有的语法设计都在这个 crate 体现.
 
-快速开始
----------
+目前有 `Anhor` 和 `Category` 这两种要素.以后还会有 `Tag` 和 `Domain`.
 
-1. 构建项目：
+## src/parser
 
-```bash
-cargo build --release
-```
+从代码到数据实例.
 
-2. 使用命令行工具进行转换（默认读取仓库根目录下的 `Lore.toml` 配置）：
+目前有标题和段落这两种行类型.
 
-```bash
-cargo run -p lang-cli --release
-```
+## src/render
 
-3. 运行全部测试：
+从数据实例到目标.
 
-```bash
-cargo test --all
-```
+标题转译为 `<hn>`,段落转化为 `<p>`.
 
-示例配置（Lore.toml）
---------------------
+## src/framework
 
-在仓库根目录放置 `Lore.toml`，例如：
-
-```toml
-from_lore_path = "./lore"
-to_html_path = "./html"
-css_url = "style.css"
-```
-
-示例：作为库使用
------------------
-
-下面示例展示如何在项目中组合解析器与渲染器：
-
-```rust
-use lang_core::{Category, Anchor};
-use lang_parser::MarkdownParser;
-use lang_impl::HtmlRenderer;
-use lang_framework::Converter;
-
-let parser = MarkdownParser;
-let renderer = HtmlRenderer;
-let converter = Converter::new(parser, renderer, "style.css".to_string());
-
-let html = converter.convert("# 标题\n第一段", "示例页面");
-println!("{}", html);
-```
-
-运行示例
---------
-
-项目中包含若干示例：
-
-```bash
-cargo run -p lang-impl --example render_basic
-cargo run -p lang-impl --example render_file
-```
-
-项目结构速览
--------------
-
-- Cargo.toml（工作区）
-- lang-core/
-- lang-framework/
-- lang-parser/
-- lang-impl/
-- lang-cli/
-
-贡献与联系
------------
-
-欢迎提交 issue / PR。若需我继续：
-
-- 为 README 增加更多使用示例（例如 CI、Docker）
-- 增补 API 文档或示例页面模板
-
-许可
----
-
-详见仓库根目录的 [LICENSE](LICENSE)。
-
-Badges（占位）
-----------------
-
-下面是常用 badge 的示例 Markdown 语法：
-
-- CI 状态（Actions `ci.yml`）：
-
-	[![CI](https://github.com/dotCorain/lore-pages/actions/workflows/ci.yml/badge.svg)](https://github.com/dotCorain/lore-pages/actions/workflows/ci.yml)
-
-- Docs 发布（Actions `docs.yml`）：
-
-	[![Docs](https://github.com/dotCorain/lore-pages/actions/workflows/docs.yml/badge.svg)](https://github.com/dotCorain/lore-pages/actions/workflows/docs.yml)
-
-- Coverage（Actions `coverage.yml`）：
-
-	[![Coverage](https://github.com/dotCorain/lore-pages/actions/workflows/coverage.yml/badge.svg)](https://github.com/dotCorain/lore-pages/actions/workflows/coverage.yml)
+基于 parser 和 render 导出 cli.
