@@ -110,9 +110,3 @@ Badges（占位）
 - Coverage（Actions `coverage.yml`）：
 
 	[![Coverage](https://github.com/dotCorain/lore-pages/actions/workflows/coverage.yml/badge.svg)](https://github.com/dotCorain/lore-pages/actions/workflows/coverage.yml)
-
-测试覆盖说明
----------------
-
-已在 `.github/workflows/coverage.yml` 中添加了一个运行 `cargo-tarpaulin` 的工作流，它会在 push/PR 时生成覆盖报告并作为 artifact 上传。若要将覆盖结果可视化为 badge（例如 Codecov），可在仓库中配置 Codecov/GitHub App 并在 workflow 中上传到对应服务，然后在 README 中替换上方占位链接。
-
