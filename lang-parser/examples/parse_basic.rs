@@ -1,12 +1,12 @@
 //! 示例：基本的解析功能
 
 use lang_core::Node;
-use lang_parser::MarkdownParser;
 use lang_framework::Parser;
+use lang_parser::MarkdownParser;
 
 fn main() {
     let parser = MarkdownParser;
-    
+
     let markdown = "\
 # 我的第一个文档
 

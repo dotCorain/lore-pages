@@ -1,19 +1,19 @@
 //! IR 定义模块
 
 /// 文档节点类型
-/// 
+///
 /// 每个节点代表文档中的一个元素，比如标题或段落。
-/// 
+///
 /// # 示例
-/// 
+///
 /// ```
 /// use lang_core::Node;
-/// 
+///
 /// let heading = Node::Heading {
 ///     level: 2,
 ///     content: "这是二级标题".to_string(),
 /// };
-/// 
+///
 /// let paragraph = Node::Paragraph {
 ///     content: "这是普通段落。".to_string(),
 /// };
@@ -21,7 +21,7 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum Node {
     /// 标题节点
-    /// 
+    ///
     /// `level` 的取值范围是 1-4，对应 Markdown 中的 #、##、###、####
     Heading {
         /// 标题级别：1 到 4
@@ -30,7 +30,7 @@ pub enum Node {
         content: String,
     },
     /// 段落节点
-    /// 
+    ///
     /// 普通的文本段落
     Paragraph {
         /// 段落的文本内容
@@ -39,14 +39,14 @@ pub enum Node {
 }
 
 /// 整个文档
-/// 
+///
 /// `Document` 是一个包含多个 `Node` 的容器。
-/// 
+///
 /// # 示例
-/// 
+///
 /// ```
 /// use lang_core::{Document, Node};
-/// 
+///
 /// let mut doc = Document::new();
 /// doc.nodes.push(Node::Heading {
 ///     level: 1,
@@ -55,7 +55,7 @@ pub enum Node {
 /// doc.nodes.push(Node::Paragraph {
 ///     content: "欢迎阅读我的文档。".to_string(),
 /// });
-/// 
+///
 /// assert_eq!(doc.nodes.len(), 2);
 /// ```
 #[derive(Debug, Default, Clone, PartialEq)]
@@ -66,9 +66,7 @@ pub struct Document {
 impl Document {
     /// 创建一个新的空文档
     pub fn new() -> Self {
-        Self {
-            nodes: Vec::new(),
-        }
+        Self { nodes: Vec::new() }
     }
 
     /// 添加一个节点到文档末尾
@@ -115,7 +113,7 @@ mod tests {
             level: 3,
             content: "Hello".to_string(),
         };
-        
+
         match heading {
             Node::Heading { level, content } => {
                 assert_eq!(level, 3);
@@ -130,7 +128,7 @@ mod tests {
         let paragraph = Node::Paragraph {
             content: "Some text".to_string(),
         };
-        
+
         match paragraph {
             Node::Paragraph { content } => {
                 assert_eq!(content, "Some text");
