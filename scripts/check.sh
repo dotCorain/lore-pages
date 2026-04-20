@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
 
-echo "Running cargo fmt (check)..."
+echo "Running cargo fmt check"
 cargo fmt --all -- --check
 
 echo "Running cargo clippy..."

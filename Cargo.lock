@@ -25,43 +25,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "lang-cli"
+name = "lore-pages"
 version = "0.1.0"
 dependencies = [
- "lang-core",
- "lang-framework",
- "lang-impl",
- "lang-parser",
-]
-
-[[package]]
-name = "lang-core"
-version = "0.1.0"
-
-[[package]]
-name = "lang-framework"
-version = "0.1.0"
-dependencies = [
- "lang-core",
  "serde",
  "toml",
-]
-
-[[package]]
-name = "lang-impl"
-version = "0.1.0"
-dependencies = [
- "lang-core",
- "lang-framework",
- "lang-parser",
-]
-
-[[package]]
-name = "lang-parser"
-version = "0.1.0"
-dependencies = [
- "lang-core",
- "lang-framework",
 ]
 
 [[package]]

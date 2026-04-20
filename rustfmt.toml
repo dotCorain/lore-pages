@@ -1,4 +1,1 @@
-# Rustfmt 配置（仓库级）
-# 仅包含常用选项，可根据项目偏好调整
 max_width = 100
-wrap_comments = true

@@ -4,7 +4,7 @@
 
 核心组件：
 
-- `lang-core`：定义文档的中间表示（IR），包含 `Document` 与 `Node`。
+- `lang-core`：定义文档的中间表示（IR），包含 `Category` 与 `Anchor`。
 - `lang-framework`：提供解析器/渲染器的 trait、配置加载与 `Converter` 组合器。
 - `lang-parser`：简化的 Markdown 解析器（支持 1-4 级标题与段落）。
 - `lang-impl`：HTML 渲染器实现（`HtmlRenderer`）。
@@ -48,7 +48,7 @@ css_url = "style.css"
 下面示例展示如何在项目中组合解析器与渲染器：
 
 ```rust
-use lang_core::{Document, Node};
+use lang_core::{Category, Anchor};
 use lang_parser::MarkdownParser;
 use lang_impl::HtmlRenderer;
 use lang_framework::Converter;
@@ -110,9 +110,3 @@ Badges（占位）
 - Coverage（Actions `coverage.yml`）：
 
 	[![Coverage](https://github.com/dotCorain/lore-pages/actions/workflows/coverage.yml/badge.svg)](https://github.com/dotCorain/lore-pages/actions/workflows/coverage.yml)
-
-测试覆盖说明
----------------
-
-已在 `.github/workflows/coverage.yml` 中添加了一个运行 `cargo-tarpaulin` 的工作流，它会在 push/PR 时生成覆盖报告并作为 artifact 上传。若要将覆盖结果可视化为 badge（例如 Codecov），可在仓库中配置 Codecov/GitHub App 并在 workflow 中上传到对应服务，然后在 README 中替换上方占位链接。
-
