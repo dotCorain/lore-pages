@@ -1,4 +1,7 @@
+[parser]
+
+[renderer]
 from_lore_path = "./lore_src"
 to_html_path = "./docs"
-css_url = "style.css"
+css_url = "../style.css"
 lang = "zh-CH"

@@ -1,8 +1,14 @@
 [package]
 name = "lore-pages"
-version = "0.1.0"
-edition = "2021"
+version = "0.1.1"
+edition = "2024"
 authors = ["FleetingLore <macro__9@outlook.com>"]
+
+description = "Lore Anchor for Pages"
+license-file = "LICENSE"
+readme = "README.md"
+homepage = "https://github.com/dotCorain/lore-pages"
+repository = "https://github.com/dotCorain/lore-pages"
 
 [profile.release]
 opt-level = 3
