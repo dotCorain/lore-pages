@@ -97,7 +97,7 @@ cargo run -p lang-impl --example render_file
 Badges（占位）
 ----------------
 
-下面是常用 badge 的示例 Markdown 语法（请把 `dotCorain/lore-pages` 替换为你的仓库路径）：
+下面是常用 badge 的示例 Markdown 语法：
 
 - CI 状态（Actions `ci.yml`）：
 
