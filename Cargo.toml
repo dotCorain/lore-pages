@@ -1,0 +1,15 @@
+[package]
+name = "lore-pages"
+version = "0.1.0"
+edition = "2021"
+authors = ["FleetingLore <macro__9@outlook.com>"]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+
+[dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
+toml = "1.1.2"

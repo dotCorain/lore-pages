@@ -1,0 +1,75 @@
+/* 全局样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #fff;
+    font-family: "PingFang SC", sans-serif;
+    line-height: 1.6;
+    padding: 60px;
+}
+
+br {
+    height: 40px;
+}
+
+/* 段落样式 */
+
+p {
+    font-size: 16px;
+    margin: 0 0 1.25em 0;
+}
+
+p:hover {
+    background-color: #f3f3f3;
+    transition: border-color 0.2s ease;
+}
+
+.title {
+    color: #020090;
+    font-size: 25px;
+    padding-top: 12px;
+    border-top: 2px solid #f3f3f3;
+}
+
+.title:hover {
+    background-color: #f3f3f3;
+    border-top-color: #00d0d0;
+    border-top-style: dashed;
+    transition: border-color 0.2s ease;
+}
+
+/* 链接样式(抽象) */
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+/* 链接样式 */
+
+.link_lore {
+    color: #009090;
+    border-bottom: 2px inset transparent;
+    transition: border-color 0.2s ease;
+}
+
+.link_lore:hover {
+    border-bottom-color: #009090;
+}
+
+.link_html {
+    color: #05aa6d;
+    border-bottom: 2px inset transparent;
+    transition: border-color 0.2s ease;
+}
+
+.link_html:hover {
+    border-bottom-color: #05aa6d;
+}
