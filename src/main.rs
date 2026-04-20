@@ -1,5 +1,5 @@
-use lore_pages::framework::config::Config;
 use lore_pages::framework::converter::Converter;
+use lore_pages::framework::renderer_config::Config;
 use lore_pages::parser::MarkdownParser;
 use lore_pages::render::HtmlRenderer;
 use std::fs;

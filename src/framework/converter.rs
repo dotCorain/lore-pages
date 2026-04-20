@@ -1,41 +1,51 @@
-use crate::framework::config::Config;
+use crate::framework::category_config::CategoryConfig;
 use crate::framework::parser::Parser;
+use crate::framework::parser_config::ParserConfig;
 use crate::framework::renderer::Renderer;
+use crate::framework::renderer_config::RenderConfig;
 
-pub struct Converter<P, R> {
+pub struct CategoryConverter<'a, P, R> {
     parser: P,
     renderer: R,
-    css_url: String,
+    category_config: &'a CategoryConfig,
+    renderer_config: &'a RenderConfig,
+    parser_config: &'a ParserConfig,
 }
 
-impl<P, R> Converter<P, R>
+impl<'a, P, R> CategoryConverter<'a, P, R>
 where
-    P: Parser,
-    R: Renderer,
+    P: Parser<'a>,
+    R: Renderer<'a>,
 {
-    pub fn new(parser: P, renderer: R, css_url: String) -> Self {
+    pub fn from_config(
+        parser: P,
+        renderer: R,
+        category_config: &'a CategoryConfig,
+        renderer_config: &'a RenderConfig,
+        parser_config: &'a ParserConfig,
+    ) -> Self {
         Self {
             parser,
             renderer,
-            css_url,
+            category_config,
+            renderer_config,
+            parser_config,
         }
     }
 
-    pub fn from_config(config: &Config, parser: P, renderer: R) -> Self {
-        Self {
-            parser,
-            renderer,
-            css_url: config.css_url.clone(),
-        }
-    }
-
-    pub fn convert(&self, input: &str, title: &str) -> String {
-        let doc = self.parser.parse(input);
-        self.renderer.render(&doc, title, &self.css_url)
+    pub fn convert(
+        &self,
+        raw: &'a str,
+        category_config: &'a CategoryConfig,
+        renderer_config: &'a RenderConfig,
+        parser_config: &'a ParserConfig,
+    ) -> String {
+        let doc = &self.parser.parse(raw, parser_config);
+        self.renderer.render(doc, category_config, renderer_config)
     }
 
     pub fn css_url(&self) -> &str {
-        &self.css_url
+        &self.renderer_config.css_url
     }
 
     pub fn parser(&self) -> &P {
