@@ -97,19 +97,19 @@ cargo run -p lang-impl --example render_file
 Badges（占位）
 ----------------
 
-下面是常用 badge 的示例 Markdown 语法（请把 `<OWNER>/<REPO>` 替换为你的仓库路径）：
+下面是常用 badge 的示例 Markdown 语法（请把 `dotCorain/lore-pages` 替换为你的仓库路径）：
 
 - CI 状态（Actions `ci.yml`）：
 
-	[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
+	[![CI](https://github.com/dotCorain/lore-pages/actions/workflows/ci.yml/badge.svg)](https://github.com/dotCorain/lore-pages/actions/workflows/ci.yml)
 
 - Docs 发布（Actions `docs.yml`）：
 
-	[![Docs](https://github.com/<OWNER>/<REPO>/actions/workflows/docs.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/docs.yml)
+	[![Docs](https://github.com/dotCorain/lore-pages/actions/workflows/docs.yml/badge.svg)](https://github.com/dotCorain/lore-pages/actions/workflows/docs.yml)
 
 - Coverage（Actions `coverage.yml`）：
 
-	[![Coverage](https://github.com/<OWNER>/<REPO>/actions/workflows/coverage.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/coverage.yml)
+	[![Coverage](https://github.com/dotCorain/lore-pages/actions/workflows/coverage.yml/badge.svg)](https://github.com/dotCorain/lore-pages/actions/workflows/coverage.yml)
 
 测试覆盖说明
 ---------------
