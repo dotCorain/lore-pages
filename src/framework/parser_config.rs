@@ -13,6 +13,9 @@ struct ParserTable {
     pub url_link_key_escape: Option<String>,
     pub comment_key: Option<String>,
     pub comment_key_escape: Option<String>,
+    pub placeholder_key_escape: Option<String>,
+    pub breakline_key: Option<String>,
+    pub breakline_key_escape: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -21,6 +24,9 @@ pub struct ParserConfig {
     pub url_link_key_escape: String,
     pub comment_key: String,
     pub comment_key_escape: String,
+    pub placeholder_key_escape: String,
+    pub breakline_key: String,
+    pub breakline_key_escape: String,
 }
 
 impl ParserConfig {
@@ -32,6 +38,9 @@ impl ParserConfig {
             url_link_key_escape: None,
             comment_key: None,
             comment_key_escape: None,
+            placeholder_key_escape: None,
+            breakline_key: None,
+            breakline_key_escape: None,
         });
 
         Ok(Self {
@@ -43,6 +52,13 @@ impl ParserConfig {
             comment_key_escape: parser
                 .comment_key_escape
                 .unwrap_or_else(|| "\\%".to_string()),
+            placeholder_key_escape: parser
+                .placeholder_key_escape
+                .unwrap_or_else(|| "\\_".to_string()),
+            breakline_key: parser.breakline_key.unwrap_or_else(|| "---".to_string()),
+            breakline_key_escape: parser
+                .breakline_key_escape
+                .unwrap_or_else(|| "\\---".to_string()),
         })
     }
 
@@ -58,6 +74,9 @@ impl Default for ParserConfig {
             url_link_key_escape: "\\|".to_string(),
             comment_key: "%".to_string(),
             comment_key_escape: "\\%".to_string(),
+            placeholder_key_escape: "\\_".to_string(),
+            breakline_key: "---".to_string(),
+            breakline_key_escape: "\\---".to_string(),
         }
     }
 }

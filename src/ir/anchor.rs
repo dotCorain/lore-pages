@@ -7,6 +7,10 @@ pub enum Anchor {
     Paragraph {
         content: String,
     },
+    BreakLine,
+    PlaceHolderLine {
+        content: String,
+    },
     UrlLink {
         name: String,
         url: String,

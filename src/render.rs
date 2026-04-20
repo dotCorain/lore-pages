@@ -49,11 +49,17 @@ fn render_node(node: &Anchor) -> String {
             format!("  <{}>{}</{}>", tag, escape_html(content), tag)
         }
         Anchor::Paragraph { content } => {
-            if content.is_empty() {
-                "  <br>".to_string()
+            if content.trim().is_empty() {
+                // do not render empty paragraphs as <br>
+                String::new()
             } else {
                 format!("  <p>{}</p>", escape_html(content))
             }
+        }
+        Anchor::BreakLine => "  <br>".to_string(),
+        Anchor::PlaceHolderLine { .. } => {
+            // placeholder lines do not render any output
+            String::new()
         }
         Anchor::UrlLink { name, url } => {
             format!(

@@ -16,8 +16,12 @@ impl Parser for MarkdownParser {
         let mut doc = Category::new();
 
         for line in input.lines() {
-            if let Some((level, content)) = parse_heading(line) {
+            if let Some(content) = parse_placeholder(line, parser_config) {
+                doc.push(Anchor::PlaceHolderLine { content });
+            } else if let Some((level, content)) = parse_heading(line) {
                 doc.push(Anchor::Heading { level, content });
+            } else if parse_breakline(line, parser_config) {
+                doc.push(Anchor::BreakLine);
             } else if let Some(comment_content) = parse_comment(line, parser_config) {
                 doc.push(Anchor::Comment {
                     content: comment_content,
@@ -38,8 +42,16 @@ impl Parser for MarkdownParser {
                         &parser_config.comment_key,
                     );
                 }
+                if !parser_config.placeholder_key_escape.is_empty() {
+                    content = content.replace(&parser_config.placeholder_key_escape, "_");
+                }
 
-                doc.push(Anchor::Paragraph { content });
+                // skip truly empty lines (or lines with only whitespace)
+                if content.trim().is_empty() {
+                    // do not push an empty paragraph (no automatic <br>)
+                } else {
+                    doc.push(Anchor::Paragraph { content });
+                }
             }
         }
 
@@ -132,5 +144,62 @@ pub fn parse_comment(
         Some(content)
     } else {
         None
+    }
+}
+
+pub fn parse_placeholder(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<String> {
+    let marker = "_";
+
+    if parser_config.placeholder_key_escape.is_empty() {
+        if line.starts_with(marker) {
+            let content = if line.len() > marker.len() {
+                line[marker.len()..].to_string()
+            } else {
+                String::new()
+            };
+            Some(content)
+        } else {
+            None
+        }
+    } else {
+        let sep = format!("{}{}", parser_config.placeholder_key_escape, marker);
+        if line.starts_with(&sep) {
+            // escaped marker at start -> not a placeholder
+            None
+        } else if line.starts_with(marker) {
+            let content = if line.len() > marker.len() {
+                line[marker.len()..].to_string()
+            } else {
+                String::new()
+            };
+            Some(content)
+        } else {
+            None
+        }
+    }
+}
+
+pub fn parse_breakline(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> bool {
+    let key = &parser_config.breakline_key;
+    if key.is_empty() {
+        return false;
+    }
+
+    if parser_config.breakline_key_escape.is_empty() {
+        line.starts_with(key)
+    } else {
+        let sep = format!("{}{}", parser_config.breakline_key_escape, key);
+        if line.starts_with(&sep) {
+            // escaped marker at start -> not a breakline
+            false
+        } else {
+            line.starts_with(key)
+        }
     }
 }
