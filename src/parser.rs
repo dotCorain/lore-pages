@@ -5,7 +5,12 @@ use crate::ir::category::Category;
 pub struct MarkdownParser;
 
 impl Parser for MarkdownParser {
-    fn parse(&self, input: &str) -> Category {
+    fn parse(
+        &self,
+        input: &str,
+        _category_config: &crate::framework::category_config::CategoryConfig,
+        _parser_config: &crate::framework::parser_config::ParserConfig,
+    ) -> Category {
         let mut doc = Category::new();
 
         for line in input.lines() {

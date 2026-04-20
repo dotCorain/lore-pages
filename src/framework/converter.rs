@@ -7,15 +7,17 @@ use crate::framework::renderer_config::RenderConfig;
 pub struct CategoryConverter<'a, P, R> {
     parser: P,
     renderer: R,
+    #[allow(dead_code)]
     category_config: &'a CategoryConfig,
     renderer_config: &'a RenderConfig,
+    #[allow(dead_code)]
     parser_config: &'a ParserConfig,
 }
 
 impl<'a, P, R> CategoryConverter<'a, P, R>
 where
-    P: Parser<'a>,
-    R: Renderer<'a>,
+    P: Parser,
+    R: Renderer,
 {
     pub fn from_config(
         parser: P,
@@ -33,15 +35,27 @@ where
         }
     }
 
-    pub fn convert(
+    pub fn convert<'b>(
         &self,
-        raw: &'a str,
-        category_config: &'a CategoryConfig,
-        renderer_config: &'a RenderConfig,
-        parser_config: &'a ParserConfig,
+        raw: &'b str,
+        category_config: &'b CategoryConfig,
+        renderer_config: &'b RenderConfig,
+        parser_config: &'b ParserConfig,
     ) -> String {
-        let doc = &self.parser.parse(raw, parser_config);
-        self.renderer.render(doc, category_config, renderer_config)
+        let doc = self.parser.parse(raw, category_config, parser_config);
+        self.renderer.render(&doc, category_config, renderer_config)
+    }
+
+    pub fn convert_simple(
+        &self,
+        raw: &str,
+    ) -> String {
+        self.convert(
+            raw,
+            self.category_config,
+            self.renderer_config,
+            self.parser_config,
+        )
     }
 
     pub fn css_url(&self) -> &str {

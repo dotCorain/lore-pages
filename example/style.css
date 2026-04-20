@@ -19,7 +19,7 @@ br {
 /* 段落样式 */
 
 p {
-    font-size: 16px;
+    font-size: 15px;
     margin: 0 0 1.25em 0;
 }
 
@@ -28,6 +28,63 @@ p:hover {
     transition: border-color 0.2s ease;
 }
 
+h1 {
+    color: #020090;
+    font-size: 25px;
+    padding-top: 12px;
+    border-top: 2px solid #f3f3f3;
+}
+
+h1:hover {
+    background-color: #f3f3f3;
+    border-top-color: #00d0d0;
+    border-top-style: solid;
+    transition: border-color 0.2s ease;
+}
+
+h2 {
+    color: #020090;
+    font-size: 22px;
+    padding-top: 12px;
+    border-top: 2px solid #f3f3f3;
+}
+
+h2:hover {
+    background-color: #f3f3f3;
+    border-top-color: #00d0d0;
+    border-top-style: dashed;
+    transition: border-color 0.2s ease;
+}
+
+h3 {
+    color: #020090;
+    font-size: 18px;
+    padding-top: 12px;
+    border-top: 2px solid #f3f3f3;
+}
+
+h3:hover {
+    background-color: #f3f3f3;
+    border-top-color: #00d0d0;
+    border-top-style: dashed;
+    transition: border-color 0.2s ease;
+}
+
+h4 {
+    color: #020090;
+    font-size: 16px;
+    padding-top: 12px;
+    border-top: 2px solid #f3f3f3;
+}
+
+h4:hover {
+    background-color: #f3f3f3;
+    border-top-color: #00d0d0;
+    border-top-style: dashed;
+    transition: border-color 0.2s ease;
+}
+
+/*
 .title {
     color: #020090;
     font-size: 25px;
@@ -42,8 +99,6 @@ p:hover {
     transition: border-color 0.2s ease;
 }
 
-/* 链接样式(抽象) */
-
 a {
     text-decoration: none;
 }
@@ -51,8 +106,6 @@ a {
 a:hover {
     opacity: 0.8;
 }
-
-/* 链接样式 */
 
 .link_lore {
     color: #009090;
@@ -73,3 +126,5 @@ a:hover {
 .link_html:hover {
     border-bottom-color: #05aa6d;
 }
+
+*/
