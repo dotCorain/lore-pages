@@ -9,20 +9,24 @@ pub struct TomlConfig {
 
 #[derive(Deserialize)]
 pub struct RendererTable {
+    pub site_title: Option<String>,
     pub from_lore_path: Option<String>,
     pub to_html_path: Option<String>,
     pub css_url: Option<String>,
     pub lang: Option<String>,
     pub link_base: Option<String>,
+    pub scripts: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone)]
 pub struct RenderConfig {
+    pub site_title: String,
     pub from_lore_path: String,
     pub to_html_path: String,
     pub css_url: String,
     pub main_lang: String,
     pub link_base: String,
+    pub scripts: Vec<String>,
 }
 
 impl RenderConfig {
@@ -32,11 +36,13 @@ impl RenderConfig {
         let renderer = toml_config.renderer;
 
         Ok(Self {
+            site_title: renderer.site_title.unwrap_or_default(),
             from_lore_path: renderer.from_lore_path.unwrap_or_default(),
             to_html_path: renderer.to_html_path.unwrap_or_default(),
             css_url: renderer.css_url.unwrap_or_default(),
             main_lang: renderer.lang.unwrap_or_default(),
             link_base: renderer.link_base.unwrap_or_default(),
+            scripts: renderer.scripts.unwrap_or_default(),
         })
     }
 
@@ -48,11 +54,13 @@ impl RenderConfig {
 impl Default for RenderConfig {
     fn default() -> Self {
         Self {
+            site_title: "LorePages".to_string(),
             from_lore_path: "./lore".to_string(),
             to_html_path: "./html".to_string(),
             css_url: "https://fleetinglore.github.io/css/style.css".to_string(),
             main_lang: "en-US".to_string(),
             link_base: "".to_string(),
+            scripts: vec![], // 新增：默认为空
         }
     }
 }

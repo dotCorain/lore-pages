@@ -4,9 +4,9 @@ use crate::framework::parser_config::ParserConfig;
 use crate::ir::anchor::Anchor;
 use crate::ir::category::Category;
 
-pub struct MarkdownParser;
+pub struct LorePagesParser;
 
-impl Parser for MarkdownParser {
+impl Parser for LorePagesParser {
     fn parse(
         &self,
         input: &str,
@@ -283,23 +283,26 @@ pub fn parse_domain(
         }
     }
 
-    let sep = format!("{} ", key_front);
-    if line.starts_with(&sep) {
-        let sep = format!(" {} ", &key[2..]); // TODO: can be better
-        if let Some(pos) = line.find(&sep) {
-            let left = &line[..pos];
-            let right = &line[pos + sep.len()..];
-
-            let name = unescape(left.trim(), key_escape, key);
-            let value = unescape(right.trim(), key_escape, key);
-
-            Some((name, value))
-        } else {
-            None
-        }
-    } else {
-        None
+    // 格式: "{key_front} 标题 {key} 值"
+    let prefix = format!("{} ", key_front);
+    if !line.starts_with(&prefix) {
+        return None;
     }
+
+    let after_prefix = &line[prefix.len()..];
+    let sep = format!(" {} ", key);
+
+    if let Some(pos) = after_prefix.find(&sep) {
+        let title = after_prefix[..pos].trim();
+        let value = after_prefix[pos + sep.len()..].trim();
+
+        if !title.is_empty() && !value.is_empty() {
+            let title = unescape(title, key_escape, key);
+            let value = unescape(value, key_escape, key);
+            return Some((title, value));
+        }
+    }
+    None
 }
 
 pub fn parse_inner_url_open(
