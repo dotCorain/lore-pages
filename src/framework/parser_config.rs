@@ -28,6 +28,14 @@ struct ParserTable {
     pub breakline_key_escape: Option<String>,
     pub image_key: Option<String>,
     pub image_key_escape: Option<String>,
+    pub inner_url_key: Option<String>,
+    pub inner_url_key_escape: Option<String>,
+    pub inner_lore_key: Option<String>,
+    pub inner_lore_key_escape: Option<String>,
+    pub inner_open_key: Option<String>,
+    pub inner_open_key_escape: Option<String>,
+    pub inner_close_key: Option<String>,
+    pub inner_close_key_escape: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -45,6 +53,14 @@ pub struct ParserConfig {
     pub breakline_key_escape: String,
     pub image_key: String,
     pub image_key_escape: String,
+    pub inner_url_key: String,
+    pub inner_url_key_escape: String,
+    pub inner_lore_key: String,
+    pub inner_lore_key_escape: String,
+    pub inner_open_key: String,
+    pub inner_open_key_escape: String,
+    pub inner_close_key: String,
+    pub inner_close_key_escape: String,
 }
 
 impl ParserConfig {
@@ -77,6 +93,14 @@ impl ParserConfig {
             breakline_key_escape: None,
             image_key: None,
             image_key_escape: None,
+            inner_url_key: None,
+            inner_url_key_escape: None,
+            inner_lore_key: None,
+            inner_lore_key_escape: None,
+            inner_open_key: None,
+            inner_open_key_escape: None,
+            inner_close_key: None,
+            inner_close_key_escape: None,
         });
 
         // 构造最终的 ParserConfig：对每个可能为 None 的字段使用默认值
@@ -95,6 +119,14 @@ impl ParserConfig {
             breakline_key_escape: parser.breakline_key_escape.unwrap_or_default(),
             image_key: parser.image_key.unwrap_or_default(),
             image_key_escape: parser.image_key_escape.unwrap_or_default(),
+            inner_url_key: parser.inner_url_key.unwrap_or_default(),
+            inner_url_key_escape: parser.inner_url_key_escape.unwrap_or_default(),
+            inner_lore_key: parser.inner_lore_key.unwrap_or_default(),
+            inner_lore_key_escape: parser.inner_lore_key_escape.unwrap_or_default(),
+            inner_open_key: parser.inner_open_key.unwrap_or_default(),
+            inner_open_key_escape: parser.inner_open_key_escape.unwrap_or_default(),
+            inner_close_key: parser.inner_close_key.unwrap_or_default(),
+            inner_close_key_escape: parser.inner_close_key_escape.unwrap_or_default(),
         })
     }
 
@@ -121,6 +153,14 @@ impl Default for ParserConfig {
             breakline_key_escape: "\\---".to_string(),
             image_key: "|".to_string(),
             image_key_escape: "\\|".to_string(),
+            inner_url_key: ">".to_string(),
+            inner_url_key_escape: "\\>".to_string(),
+            inner_lore_key: "=".to_string(),
+            inner_lore_key_escape: "\\=".to_string(),
+            inner_open_key: "-".to_string(),
+            inner_open_key_escape: "\\-".to_string(),
+            inner_close_key: "+".to_string(),
+            inner_close_key_escape: "\\+".to_string(),
         }
     }
 }

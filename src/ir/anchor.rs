@@ -26,4 +26,20 @@ pub enum Anchor {
     Image {
         url: String,
     },
+    InnerUrlOpen {
+        title: String,
+        url: String,
+    },
+    InnerUrlClose {
+        title: String,
+        url: String,
+    },
+    InnerLoreOpen {
+        title: String,
+        path: String,
+    },
+    InnerLoreClose {
+        title: String,
+        path: String,
+    },
 }

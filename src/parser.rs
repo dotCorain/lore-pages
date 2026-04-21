@@ -42,6 +42,26 @@ impl Parser for MarkdownParser {
                 continue;
             }
 
+            if let Some((title, url)) = parse_inner_url_open(line, parser_config) {
+                doc.push(Anchor::InnerUrlOpen { title, url });
+                continue;
+            }
+
+            if let Some((title, url)) = parse_inner_url_close(line, parser_config) {
+                doc.push(Anchor::InnerUrlClose { title, url });
+                continue;
+            }
+
+            if let Some((title, path)) = parse_inner_lore_open(line, parser_config) {
+                doc.push(Anchor::InnerLoreOpen { title, path });
+                continue;
+            }
+
+            if let Some((title, path)) = parse_inner_lore_close(line, parser_config) {
+                doc.push(Anchor::InnerLoreClose { title, path });
+                continue;
+            }
+
             if let Some((name, url)) = parse_url_link(line, parser_config) {
                 doc.push(Anchor::UrlLink { name, url });
                 continue;
@@ -58,9 +78,13 @@ impl Parser for MarkdownParser {
             content = unescape(&content, &parser_config.url_link_key_escape, &parser_config.url_link_key);
             content = unescape(&content, &parser_config.lore_link_key_escape, &parser_config.lore_link_key);
             content = unescape(&content, &parser_config.comment_key_escape, &parser_config.comment_key);
-            if !parser_config.placeholder_key_escape.is_empty() {
-                content = content.replace(&parser_config.placeholder_key_escape, "_");
-            }
+            content = unescape(&content, &parser_config.placeholder_key_escape, &parser_config.placeholder_key);
+            content = unescape(&content, &parser_config.breakline_key_escape, &parser_config.breakline_key);
+            content = unescape(&content, &parser_config.image_key_escape, &parser_config.image_key);
+            content = unescape(&content, &parser_config.inner_close_key_escape, &parser_config.inner_close_key);
+            content = unescape(&content, &parser_config.inner_open_key_escape, &parser_config.inner_open_key);
+            content = unescape(&content, &parser_config.inner_lore_key_escape, &parser_config.inner_lore_key);
+            content = unescape(&content, &parser_config.inner_url_key_escape, &parser_config.inner_url_key);
 
             // skip truly empty lines (or lines with only whitespace)
             if content.trim().is_empty() {
@@ -228,4 +252,104 @@ pub fn parse_breakline(
     parser_config: &ParserConfig,
 ) -> bool {
     parse_prefix(line, &parser_config.breakline_key, &parser_config.breakline_key_escape, false).is_some()
+}
+
+pub fn parse_domain(
+    line: &str,
+    key_front: &str,
+    key_front_escape: &str,
+    key: &str,
+    key_escape: &str,
+) -> Option<(String, String)> {
+    if key_front.is_empty() {
+        return None;
+    }
+
+    if !key_front_escape.is_empty() {
+        let esc_prefix = format!("{}{}", key_front_escape, key_front);
+        if line.starts_with(&esc_prefix) {
+            return None;
+        }
+    }
+
+    if key.is_empty() {
+        return None;
+    }
+
+    if !key_escape.is_empty() {
+        let esc_prefix = format!("{}{}", key_escape, key);
+        if line.starts_with(&esc_prefix) {
+            return None;
+        }
+    }
+
+    let sep = format!("{} ", key_front);
+    if line.starts_with(&sep) {
+        let sep = format!(" {} ", &key[2..]); // TODO: can be better
+        if let Some(pos) = line.find(&sep) {
+            let left = &line[..pos];
+            let right = &line[pos + sep.len()..];
+
+            let name = unescape(left.trim(), key_escape, key);
+            let value = unescape(right.trim(), key_escape, key);
+
+            Some((name, value))
+        } else {
+            None
+        }
+    } else {
+        None
+    }
+}
+
+pub fn parse_inner_url_open(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<(String, String)> {
+    parse_domain(
+        line,
+        &parser_config.inner_open_key,
+        &parser_config.inner_open_key_escape,
+        &parser_config.inner_url_key,
+        &parser_config.inner_url_key_escape,
+    )
+}
+
+pub fn parse_inner_url_close(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<(String, String)> {
+    parse_domain(
+        line,
+        &parser_config.inner_close_key,
+        &parser_config.inner_close_key_escape,
+        &parser_config.inner_url_key,
+        &parser_config.inner_url_key_escape,
+    )
+}
+
+pub fn parse_inner_lore_open(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<(String, String)> {
+    parse_domain(
+        line,
+        &parser_config.inner_open_key,
+        &parser_config.inner_open_key_escape,
+        &parser_config.inner_lore_key,
+        &parser_config.inner_lore_key_escape,
+    )
+}
+
+pub fn parse_inner_lore_close(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<(String, String)> {
+    parse_domain(
+        line,
+        &parser_config.inner_close_key,
+        &parser_config.inner_close_key_escape,
+        &parser_config.inner_lore_key,
+        &parser_config.inner_lore_key_escape,
+    )
 }
