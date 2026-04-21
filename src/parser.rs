@@ -4,8 +4,6 @@ use crate::framework::parser_config::ParserConfig;
 use crate::ir::anchor::Anchor;
 use crate::ir::category::Category;
 
-// 解析器实现：将 lore 文本逐行解析成中间表示 `Category`（由 `Anchor` 节点组成）
-
 pub struct MarkdownParser;
 
 impl Parser for MarkdownParser {
@@ -17,32 +15,30 @@ impl Parser for MarkdownParser {
     ) -> Category {
         let mut doc = Category::new();
 
-        let mut lines = input.lines();
-        loop {
-            let line = match lines.next() {
-                Some(l) => l,
-                None => break,
-            };
+        let lines = input.lines();
+        for line in lines {
+            if let Some((level, content)) = parse_heading(line) {
+                doc.push(Anchor::Heading { level, content });
+                continue;
+            }
+
+            if let Some(comment_content) = parse_comment(line, parser_config) {
+                doc.push(Anchor::Comment { content: comment_content });
+                continue;
+            }
+
+            if let Some(url) = parse_image(line, parser_config) {
+                doc.push(Anchor::Image { url });
+                continue;
+            }
 
             if let Some(content) = parse_placeholder(line, parser_config) {
                 doc.push(Anchor::PlaceHolderLine { content });
                 continue;
             }
 
-            if let Some((level, content)) = parse_heading(line) {
-                doc.push(Anchor::Heading { level, content });
-                continue;
-            }
-
             if parse_breakline(line, parser_config) {
                 doc.push(Anchor::BreakLine);
-                continue;
-            }
-
-            if let Some(comment_content) = parse_comment(line, parser_config) {
-                doc.push(Anchor::Comment {
-                    content: comment_content,
-                });
                 continue;
             }
 
@@ -57,25 +53,13 @@ impl Parser for MarkdownParser {
             }
 
             let mut content = line.to_string();
-            // Unescape any escaped markers so paragraphs display literal markers
-            content = unescape(
-                &content,
-                &parser_config.url_link_key_escape,
-                &parser_config.url_link_key,
-            );
-            content = unescape(
-                &content,
-                &parser_config.lore_link_key_escape,
-                &parser_config.lore_link_key,
-            );
-            content = unescape(
-                &content,
-                &parser_config.comment_key_escape,
-                &parser_config.comment_key,
-            );
+            // Unescape any escaped markers so paragraphs
+            // display literal markers
+            content = unescape(&content, &parser_config.url_link_key_escape, &parser_config.url_link_key);
+            content = unescape(&content, &parser_config.lore_link_key_escape, &parser_config.lore_link_key);
+            content = unescape(&content, &parser_config.comment_key_escape, &parser_config.comment_key);
             if !parser_config.placeholder_key_escape.is_empty() {
-                content =
-                    content.replace(&parser_config.placeholder_key_escape, "_");
+                content = content.replace(&parser_config.placeholder_key_escape, "_");
             }
 
             // skip truly empty lines (or lines with only whitespace)
@@ -90,8 +74,10 @@ impl Parser for MarkdownParser {
     }
 }
 
-/// Parse repeated single-character marker prefixes (e.g. `#`, up to `max` times).
-/// If `require_space` is true, require a space after the repeated markers.
+/// Parse repeated single-character marker prefixes (e.g. `#`,
+///  up to `max` times).
+/// If `require_space` is true, require a space after the
+/// repeated markers.
 pub fn parse_repeated_prefix(
     line: &str,
     marker: char,
@@ -114,13 +100,9 @@ pub fn parse_repeated_prefix(
     }
 
     match (require_space, bytes.get(count)) {
-        (true, Some(&b' ')) => {
-            Some((count as u8, line[count + 1..].to_string()))
-        }
+        (true, Some(&b' ')) => Some((count as u8, line[count + 1..].to_string())),
         (true, _) => None,
-        (false, _) => {
-            Some((count as u8, line.get(count..).unwrap_or("").to_string()))
-        }
+        (false, _) => Some((count as u8, line.get(count..).unwrap_or("").to_string())),
     }
 }
 
@@ -128,32 +110,9 @@ pub fn parse_heading(line: &str) -> Option<(u8, String)> {
     parse_repeated_prefix(line, '#', 4, true)
 }
 
-pub fn parse_url_link(
-    line: &str,
-    parser_config: &ParserConfig,
-) -> Option<(String, String)> {
-    // kept for compatibility but replaced by `parse_binary`
-    parse_binary(
-        line,
-        &parser_config.url_link_key,
-        &parser_config.url_link_key_escape,
-    )
-}
-
-pub fn parse_lore_link(
-    line: &str,
-    parser_config: &ParserConfig,
-) -> Option<(String, String)> {
-    // symmetric helper for lore links
-    parse_binary(
-        line,
-        &parser_config.lore_link_key,
-        &parser_config.lore_link_key_escape,
-    )
-}
-
 /// Replace escaped marker sequences with the actual marker.
-/// If `escape` is empty this returns `s` as an owned `String` unchanged.
+/// If `escape` is empty this returns `s` as an
+/// owned `String` unchanged.
 fn unescape(
     s: &str,
     escape: &str,
@@ -175,7 +134,8 @@ pub fn parse_binary(
         return None;
     }
 
-    // require spaces around the key: 'name <space> key <space> value'
+    // require spaces around the key: 'name <space>
+    // key <space> value'
     let sep = format!(" {} ", key);
     if let Some(pos) = line.find(&sep) {
         let left = &line[..pos];
@@ -191,6 +151,22 @@ pub fn parse_binary(
     }
 }
 
+pub fn parse_url_link(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<(String, String)> {
+    // kept for compatibility but replaced by `parse_binary`
+    parse_binary(line, &parser_config.url_link_key, &parser_config.url_link_key_escape)
+}
+
+pub fn parse_lore_link(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<(String, String)> {
+    // symmetric helper for lore links
+    parse_binary(line, &parser_config.lore_link_key, &parser_config.lore_link_key_escape)
+}
+
 pub fn parse_prefix(
     line: &str,
     key: &str,
@@ -201,7 +177,8 @@ pub fn parse_prefix(
         return None;
     }
 
-    // If an escape prefix is configured and the line starts with it followed by the key,
+    // If an escape prefix is configured and the line
+    // starts with it followed by the key,
     // treat it as escaped and do not match.
     if !key_escape.is_empty() {
         let esc_prefix = format!("{}{}", key_escape, key);
@@ -219,13 +196,7 @@ pub fn parse_prefix(
                 None
             }
         }
-        false => {
-            if line.starts_with(key) {
-                Some(line[key.len()..].to_string())
-            } else {
-                None
-            }
-        }
+        false => line.strip_prefix(key).map(|stripped| stripped.to_string()),
     }
 }
 
@@ -233,35 +204,28 @@ pub fn parse_comment(
     line: &str,
     parser_config: &ParserConfig,
 ) -> Option<String> {
-    let key = &parser_config.comment_key;
-    parse_prefix(line, key, &parser_config.comment_key_escape, true).map(
-        |content| {
-            unescape(
-                &content,
-                &parser_config.comment_key_escape,
-                &parser_config.comment_key,
-            )
-        },
-    )
+    parse_prefix(line, &parser_config.comment_key, &parser_config.comment_key_escape, true)
+        .map(|content| unescape(&content, &parser_config.comment_key_escape, &parser_config.comment_key))
+}
+
+pub fn parse_image(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<String> {
+    parse_prefix(line, &parser_config.image_key, &parser_config.image_key_escape, true)
+        .map(|content| unescape(&content, &parser_config.image_key_escape, &parser_config.image_key))
 }
 
 pub fn parse_placeholder(
     line: &str,
     parser_config: &ParserConfig,
 ) -> Option<String> {
-    let marker = "_";
-    parse_prefix(line, marker, &parser_config.placeholder_key_escape, false)
+    parse_prefix(line, &parser_config.placeholder_key, &parser_config.placeholder_key_escape, false)
 }
 
 pub fn parse_breakline(
     line: &str,
     parser_config: &ParserConfig,
 ) -> bool {
-    parse_prefix(
-        line,
-        &parser_config.breakline_key,
-        &parser_config.breakline_key_escape,
-        false,
-    )
-    .is_some()
+    parse_prefix(line, &parser_config.breakline_key, &parser_config.breakline_key_escape, false).is_some()
 }
