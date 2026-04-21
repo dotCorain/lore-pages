@@ -17,59 +17,72 @@ impl Parser for MarkdownParser {
     ) -> Category {
         let mut doc = Category::new();
 
-        for line in input.lines() {
+        let mut lines = input.lines();
+        loop {
+            let line = match lines.next() {
+                Some(l) => l,
+                None => break,
+            };
+
             if let Some(content) = parse_placeholder(line, parser_config) {
                 doc.push(Anchor::PlaceHolderLine { content });
-            } else if let Some((level, content)) = parse_heading(line) {
+                continue;
+            }
+
+            if let Some((level, content)) = parse_heading(line) {
                 doc.push(Anchor::Heading { level, content });
-            } else if parse_breakline(line, parser_config) {
+                continue;
+            }
+
+            if parse_breakline(line, parser_config) {
                 doc.push(Anchor::BreakLine);
-            } else if let Some(comment_content) = parse_comment(line, parser_config) {
+                continue;
+            }
+
+            if let Some(comment_content) = parse_comment(line, parser_config) {
                 doc.push(Anchor::Comment {
                     content: comment_content,
                 });
-            } else if let Some((name, url)) = parse_binary(
-                line,
-                &parser_config.url_link_key,
-                &parser_config.url_link_key_escape,
-            ) {
-                doc.push(Anchor::UrlLink { name, url });
-            } else if let Some((name, path)) = parse_binary(
-                line,
-                &parser_config.lore_link_key,
-                &parser_config.lore_link_key_escape,
-            ) {
-                doc.push(Anchor::LoreLink { name, path });
-            } else {
-                let mut content = line.to_string();
-                if !parser_config.url_link_key_escape.is_empty() {
-                    content = content.replace(
-                        &parser_config.url_link_key_escape,
-                        &parser_config.url_link_key,
-                    );
-                }
-                if !parser_config.lore_link_key_escape.is_empty() {
-                    content = content.replace(
-                        &parser_config.lore_link_key_escape,
-                        &parser_config.lore_link_key,
-                    );
-                }
-                if !parser_config.comment_key_escape.is_empty() {
-                    content = content.replace(
-                        &parser_config.comment_key_escape,
-                        &parser_config.comment_key,
-                    );
-                }
-                if !parser_config.placeholder_key_escape.is_empty() {
-                    content = content.replace(&parser_config.placeholder_key_escape, "_");
-                }
+                continue;
+            }
 
-                // skip truly empty lines (or lines with only whitespace)
-                if content.trim().is_empty() {
-                    doc.push(Anchor::EmptyLine);
-                } else {
-                    doc.push(Anchor::Paragraph { content });
-                }
+            if let Some((name, url)) = parse_url_link(line, parser_config) {
+                doc.push(Anchor::UrlLink { name, url });
+                continue;
+            }
+
+            if let Some((name, path)) = parse_lore_link(line, parser_config) {
+                doc.push(Anchor::LoreLink { name, path });
+                continue;
+            }
+
+            let mut content = line.to_string();
+            // Unescape any escaped markers so paragraphs display literal markers
+            content = unescape(
+                &content,
+                &parser_config.url_link_key_escape,
+                &parser_config.url_link_key,
+            );
+            content = unescape(
+                &content,
+                &parser_config.lore_link_key_escape,
+                &parser_config.lore_link_key,
+            );
+            content = unescape(
+                &content,
+                &parser_config.comment_key_escape,
+                &parser_config.comment_key,
+            );
+            if !parser_config.placeholder_key_escape.is_empty() {
+                content =
+                    content.replace(&parser_config.placeholder_key_escape, "_");
+            }
+
+            // skip truly empty lines (or lines with only whitespace)
+            if content.trim().is_empty() {
+                doc.push(Anchor::EmptyLine);
+            } else {
+                doc.push(Anchor::Paragraph { content });
             }
         }
 
@@ -77,12 +90,19 @@ impl Parser for MarkdownParser {
     }
 }
 
-pub fn parse_heading(line: &str) -> Option<(u8, String)> {
+/// Parse repeated single-character marker prefixes (e.g. `#`, up to `max` times).
+/// If `require_space` is true, require a space after the repeated markers.
+pub fn parse_repeated_prefix(
+    line: &str,
+    marker: char,
+    max: usize,
+    require_space: bool,
+) -> Option<(u8, String)> {
     let bytes = line.as_bytes();
-    let mut count = 0;
+    let mut count = 0usize;
 
-    for &b in bytes.iter().take(4) {
-        if b == b'#' {
+    for &b in bytes.iter().take(max) {
+        if b == marker as u8 {
             count += 1;
         } else {
             break;
@@ -93,12 +113,19 @@ pub fn parse_heading(line: &str) -> Option<(u8, String)> {
         return None;
     }
 
-    if bytes.len() > count && bytes[count] == b' ' {
-        let content = line[count + 1..].to_string();
-        Some((count as u8, content))
-    } else {
-        None
+    match (require_space, bytes.get(count)) {
+        (true, Some(&b' ')) => {
+            Some((count as u8, line[count + 1..].to_string()))
+        }
+        (true, _) => None,
+        (false, _) => {
+            Some((count as u8, line.get(count..).unwrap_or("").to_string()))
+        }
     }
+}
+
+pub fn parse_heading(line: &str) -> Option<(u8, String)> {
+    parse_repeated_prefix(line, '#', 4, true)
 }
 
 pub fn parse_url_link(
@@ -111,6 +138,32 @@ pub fn parse_url_link(
         &parser_config.url_link_key,
         &parser_config.url_link_key_escape,
     )
+}
+
+pub fn parse_lore_link(
+    line: &str,
+    parser_config: &ParserConfig,
+) -> Option<(String, String)> {
+    // symmetric helper for lore links
+    parse_binary(
+        line,
+        &parser_config.lore_link_key,
+        &parser_config.lore_link_key_escape,
+    )
+}
+
+/// Replace escaped marker sequences with the actual marker.
+/// If `escape` is empty this returns `s` as an owned `String` unchanged.
+fn unescape(
+    s: &str,
+    escape: &str,
+    replacement: &str,
+) -> String {
+    if escape.is_empty() {
+        s.to_string()
+    } else {
+        s.replace(escape, replacement)
+    }
 }
 
 pub fn parse_binary(
@@ -128,18 +181,51 @@ pub fn parse_binary(
         let left = &line[..pos];
         let right = &line[pos + sep.len()..];
 
-        let mut name = left.trim().to_string();
-        let mut value = right.trim().to_string();
-
-        // unescape any escaped key occurrences (e.g. "\\=" -> "=")
-        if !key_escape.is_empty() {
-            name = name.replace(key_escape, key);
-            value = value.replace(key_escape, key);
-        }
+        // Trim and unescape occurrences of the escaped key (if configured)
+        let name = unescape(left.trim(), key_escape, key);
+        let value = unescape(right.trim(), key_escape, key);
 
         Some((name, value))
     } else {
         None
+    }
+}
+
+pub fn parse_prefix(
+    line: &str,
+    key: &str,
+    key_escape: &str,
+    require_space: bool,
+) -> Option<String> {
+    if key.is_empty() {
+        return None;
+    }
+
+    // If an escape prefix is configured and the line starts with it followed by the key,
+    // treat it as escaped and do not match.
+    if !key_escape.is_empty() {
+        let esc_prefix = format!("{}{}", key_escape, key);
+        if line.starts_with(&esc_prefix) {
+            return None;
+        }
+    }
+
+    match require_space {
+        true => {
+            let sep = format!("{} ", key);
+            if line.starts_with(&sep) {
+                Some(line[sep.len()..].to_string())
+            } else {
+                None
+            }
+        }
+        false => {
+            if line.starts_with(key) {
+                Some(line[key.len()..].to_string())
+            } else {
+                None
+            }
+        }
     }
 }
 
@@ -148,27 +234,15 @@ pub fn parse_comment(
     parser_config: &ParserConfig,
 ) -> Option<String> {
     let key = &parser_config.comment_key;
-    if key.is_empty() {
-        return None;
-    }
-
-    // require marker at start of line followed by a space: '% ' for example
-    let sep = format!("{} ", key);
-    if line.starts_with(&sep) {
-        let mut content = line[sep.len()..].to_string();
-
-        // unescape any escaped comment key occurrences (e.g. "\\%" -> "%")
-        if !parser_config.comment_key_escape.is_empty() {
-            content = content.replace(
+    parse_prefix(line, key, &parser_config.comment_key_escape, true).map(
+        |content| {
+            unescape(
+                &content,
                 &parser_config.comment_key_escape,
                 &parser_config.comment_key,
-            );
-        }
-
-        Some(content)
-    } else {
-        None
-    }
+            )
+        },
+    )
 }
 
 pub fn parse_placeholder(
@@ -176,46 +250,18 @@ pub fn parse_placeholder(
     parser_config: &ParserConfig,
 ) -> Option<String> {
     let marker = "_";
-
-    if parser_config.placeholder_key_escape.is_empty() {
-        if line.starts_with(marker) {
-            let content = line.strip_prefix(marker).unwrap_or("").to_string();
-            Some(content)
-        } else {
-            None
-        }
-    } else {
-        let sep = format!("{}{}", parser_config.placeholder_key_escape, marker);
-        if line.starts_with(&sep) {
-            // escaped marker at start -> not a placeholder
-            None
-        } else if line.starts_with(marker) {
-            let content = line.strip_prefix(marker).unwrap_or("").to_string();
-            Some(content)
-        } else {
-            None
-        }
-    }
+    parse_prefix(line, marker, &parser_config.placeholder_key_escape, false)
 }
 
 pub fn parse_breakline(
     line: &str,
     parser_config: &ParserConfig,
 ) -> bool {
-    let key = &parser_config.breakline_key;
-    if key.is_empty() {
-        return false;
-    }
-
-    if parser_config.breakline_key_escape.is_empty() {
-        line.starts_with(key)
-    } else {
-        let sep = format!("{}{}", parser_config.breakline_key_escape, key);
-        if line.starts_with(&sep) {
-            // escaped marker at start -> not a breakline
-            false
-        } else {
-            line.starts_with(key)
-        }
-    }
+    parse_prefix(
+        line,
+        &parser_config.breakline_key,
+        &parser_config.breakline_key_escape,
+        false,
+    )
+    .is_some()
 }
