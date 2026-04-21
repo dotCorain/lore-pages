@@ -57,7 +57,7 @@ fn render_node(
         Anchor::EmptyLine => String::new(),
         Anchor::InnerUrlOpen { title, url } => {
             format!(
-                "<div class=\"foldable\" data-url=\"{}\" data-title=\"{}\"></div>",
+                "<div class=\"foldable expanded\" data-url=\"{}\" data-title=\"{}\"></div>",
                 escape_html(url),
                 escape_html(title)
             )
@@ -67,7 +67,7 @@ fn render_node(
                 String::new()
             } else {
                 format!(
-                    "<div class=\"foldable expanded\" data-url=\"{}\" data-title=\"{}\"></div>",
+                    "<div class=\"foldable\" data-url=\"{}\" data-title=\"{}\"></div>",
                     escape_html(url),
                     escape_html(title)
                 )
@@ -76,7 +76,7 @@ fn render_node(
         Anchor::InnerLoreOpen { title, path } => {
             let href = resolve_path(path, renderer_config);
             format!(
-                "<div class=\"foldable lore\" data-url=\"{}\" data-title=\"{}\"></div>",
+                "<div class=\"foldable lore expanded\" data-url=\"{}\" data-title=\"{}\"></div>",
                 escape_html(&href),
                 escape_html(title)
             )
@@ -87,7 +87,7 @@ fn render_node(
             } else {
                 let href = resolve_path(path, renderer_config);
                 format!(
-                    "<div class=\"foldable lore expanded\" data-url=\"{}\" data-title=\"{}\"></div>",
+                    "<div class=\"foldable lore\" data-url=\"{}\" data-title=\"{}\"></div>",
                     escape_html(&href),
                     escape_html(title)
                 )
