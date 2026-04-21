@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# 文件: lore.sh
+# 功能: 将 docs 目录推送到 fleetinglore/notes-physics 仓库的 gh-pages 分支
+
+set -e
+
+BUILD_DIR="docs"
+REPO="git@github.com:fleetinglore/notes-physics.git"
+
+# 检查 docs 目录是否存在
+if [ ! -d "$BUILD_DIR" ]; then
+  echo "'$BUILD_DIR' directory not found"
+  exit 1
+fi
+
+echo "Deploying '$BUILD_DIR' to gh-pages of $REPO..."
+
+# 创建临时目录
+TMP_DIR=$(mktemp -d)
+
+# 克隆 gh-pages 分支（如果不存在则创建空分支）
+if git ls-remote --heads "$REPO" gh-pages | grep -q gh-pages; then
+  git clone --depth 1 --branch gh-pages "$REPO" "$TMP_DIR"
+else
+  echo "gh-pages branch doesn't exist, creating..."
+  git clone "$REPO" "$TMP_DIR"
+  cd "$TMP_DIR"
+  git checkout --orphan gh-pages
+  git rm -rf . >/dev/null 2>&1 || true
+  cd - >/dev/null
+fi
+
+# 清空并复制新内容（排除 .DS_Store）
+cd "$TMP_DIR"
+git rm -rf . >/dev/null 2>&1 || true
+find . -mindepth 1 -not -path './.git*' -delete
+# 复制时排除 .DS_Store 文件
+rsync -av --exclude='.DS_Store' "$OLDPWD/$BUILD_DIR"/ ./
+
+# 提交并推送（同时从 git 中移除已存在的 .DS_Store）
+git add --all
+# 从 git 索引中移除 .DS_Store（如果存在）
+git rm --cached -f .DS_Store >/dev/null 2>&1 || true
+git rm --cached -f "**/.DS_Store" >/dev/null 2>&1 || true
+
+if git diff --cached --quiet; then
+  echo "No changes to commit"
+else
+  git commit -m "Deploy docs $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+  git push "$REPO" gh-pages --force
+  echo "Deployed to gh-pages"
+fi
+
+# 清理
+cd "$OLDPWD"
+rm -rf "$TMP_DIR"
