@@ -17,7 +17,5 @@ target/
 #.idea/
 
 .DS_Store
-lore/
-test/
-build
+docs/
 publish

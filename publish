@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# 文件: lore.sh
-# 功能: 将 docs 目录推送到 fleetinglore/notes-physics 仓库的 gh-pages 分支
 
 set -e
 

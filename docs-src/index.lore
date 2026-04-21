@@ -6,7 +6,7 @@
 
 所有的语法设计都在这个 crate 体现.
 
-目前有 `Anhor` 和 `Category` 这两种要素.以后还会有 `Tag` 和 `Domain`.
+目前有 Anhor 和 Category 这两种要素.以后还会有 Tag 和 Domain.
 
 ## src/parser
 
@@ -18,14 +18,8 @@
 
 从数据实例到目标.
 
-标题转译为 `<hn>`,段落转化为 `<p>`.
+标题转译为 <hn>,段落转化为 <p>.
 
 ## src/framework
 
 基于 parser 和 render 导出 cli.
-
----
-
-# Changelog
-
-这是第一个版本,无版本变更记录.
