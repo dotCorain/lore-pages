@@ -23,4 +23,7 @@ pub enum Anchor {
     Comment {
         content: String,
     },
+    Image {
+        url: String,
+    },
 }

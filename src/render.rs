@@ -17,7 +17,10 @@ impl Renderer for HtmlRenderer {
         let mut html = String::new();
 
         html.push_str("<!DOCTYPE html>\n");
-        html.push_str("<html lang=\"zh-CN\">\n");
+        html.push_str(
+            format!("<html lang=\"{}\">\n", &renderer_config.main_lang)
+                .as_str(),
+        );
         html.push_str("<head>\n");
         html.push_str("<meta charset=\"utf-8\">\n");
         html.push_str(&format!(
@@ -97,6 +100,9 @@ fn render_node(
         }
         Anchor::Comment { content } => {
             format!("  <!-- {} -->", content)
+        }
+        Anchor::Image { url } => {
+            format!("  <img src=\"{}\">", url)
         }
     }
 }
