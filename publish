@@ -5,7 +5,7 @@
 set -e
 
 BUILD_DIR="docs"
-REPO="git@github.com:fleetinglore/notes-physics.git"
+REPO="git@github.com:dotCorain/lore-pages.git"
 
 # 检查 docs 目录是否存在
 if [ ! -d "$BUILD_DIR" ]; then
