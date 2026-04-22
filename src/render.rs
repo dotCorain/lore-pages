@@ -95,7 +95,7 @@ fn render_node(
         }
         Anchor::UrlLink { name, url } => {
             format!(
-                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_url\">{}</a></p>",
+                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_url\" terget=\"_blank\">{}</a></p>",
                 escape_html(url),
                 escape_html(name)
             )
