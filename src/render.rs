@@ -95,7 +95,7 @@ fn render_node(
         }
         Anchor::UrlLink { name, url } => {
             format!(
-                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_url\" terget=\"_blank\">{}</a></p>",
+                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_url\" target=\"_blank\">{}</a></p>",
                 escape_html(url),
                 escape_html(name)
             )
@@ -103,7 +103,7 @@ fn render_node(
         Anchor::LoreLink { name, path } => {
             let href = resolve_path(path, renderer_config);
             format!(
-                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_lore\">{}</a></p>",
+                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_lore\" target=\"_blank\">{}</a></p>",
                 escape_html(&href),
                 escape_html(name)
             )
