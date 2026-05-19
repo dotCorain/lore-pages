@@ -1,4 +1,4 @@
-[parser]
+q[parser]
 url_link_key = "|"
 url_link_key_escape = "\\|"
 lore_link_key = "="
