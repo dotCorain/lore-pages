@@ -7,6 +7,8 @@ target/
 
 .idea/
 
+# Darwin
 .DS_Store
-docs/
-publish
+
+# mdbook
+book/

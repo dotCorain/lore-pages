@@ -5,12 +5,13 @@ use lore_pages::framework::renderer_config::RenderConfig;
 use lore_pages::parser::LorePagesParser;
 use lore_pages::render::HtmlRenderer;
 // 标准库：文件读写与路径处理
+
 use std::fs;
 use std::path::Path;
-
 // 程序入口
 // 返回 `Result<(), Box<dyn std::error::Error>>`：
 // - `Box<dyn std::error::Error>` 是一个“装箱”的 trait 对象，用来统一不同错误类型，便于主函数返回各种可能的错误
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 尝试从 `Lore.toml` 加载渲染配置，失败则回退到默认配置
     let renderer_config = match RenderConfig::from_file("Lore.toml") {
@@ -32,7 +33,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let parser = LorePagesParser;
     let renderer = HtmlRenderer;
 
-    let converter = CategoryConverter::from_config(parser, renderer, &category_config, &renderer_config, &parser_config);
+    let converter = CategoryConverter::from_config(
+        parser,
+        renderer,
+        &category_config,
+        &renderer_config,
+        &parser_config,
+    );
 
     // 将源目录递归转换到目标目录
     convert_directory(&converter, src_dir, dst_dir)?;
@@ -74,7 +81,9 @@ where
             let content = fs::read_to_string(&src_path)?;
             let html = converter.convert_simple(&content);
 
-            let dst_path = dst_dir.join(src_path.file_stem().unwrap()).with_extension("html");
+            let dst_path = dst_dir
+                .join(src_path.file_stem().unwrap())
+                .with_extension("html");
             fs::write(&dst_path, html)?;
             println!("{:?} -> {:?}", src_path, dst_path);
         }
@@ -86,5 +95,8 @@ where
 fn is_lore_file(path: &Path) -> bool {
     // 判断扩展名是否为 "lore"
     // `extension()` 返回 `Option<OsStr>`，后面链式转换为 `Option<&str>` 再判断是否等于 "lore"
-    path.extension().and_then(|e| e.to_str()).map(|e| e == "lore").unwrap_or(false)
+    path.extension()
+        .and_then(|e| e.to_str())
+        .map(|e| e == "lore")
+        .unwrap_or(false)
 }
