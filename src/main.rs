@@ -88,7 +88,7 @@ where
             convert_directory(converter, &src_path, &dst_path)?;
         } else if is_lore_file(&src_path) {
             let content = fs::read_to_string(&src_path)?;
-            let html = converter.convert_simple(&content);
+                let html = converter.convert_with_source(&content, &src_path.to_string_lossy());
 
             let dst_path = dst_dir
                 .join(src_path.file_stem().unwrap())
@@ -179,7 +179,7 @@ where
         };
 
         let content = fs::read_to_string(src_path)?;
-        let html = converter.convert_simple(&content);
+        let html = converter.convert_with_source(&content, &src_path.to_string_lossy());
         fs::write(&dst_path, html)?;
         println!("{:?} -> {:?}", src_path, dst_path);
     }

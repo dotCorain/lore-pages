@@ -41,9 +41,11 @@ where
         category_config: &'b CategoryConfig,
         renderer_config: &'b RenderConfig,
         parser_config: &'b ParserConfig,
+        source_path: Option<&str>,
     ) -> String {
-        let doc = self.parser.parse(raw, category_config, parser_config);
-        self.renderer.render(&doc, category_config, renderer_config)
+        let mut doc = self.parser.parse(raw, category_config, parser_config);
+        doc.auto_link_h2();
+        self.renderer.render(&doc, category_config, renderer_config, source_path)
     }
 
     pub fn convert_simple(
@@ -55,6 +57,22 @@ where
             self.category_config,
             self.renderer_config,
             self.parser_config,
+            None,
+        )
+    }
+
+    /// 同 convert_simple，但传入源文件路径用于 warning 信息。
+    pub fn convert_with_source(
+        &self,
+        raw: &str,
+        source_path: &str,
+    ) -> String {
+        self.convert(
+            raw,
+            self.category_config,
+            self.renderer_config,
+            self.parser_config,
+            Some(source_path),
         )
     }
 

@@ -6,7 +6,6 @@ use crate::framework::renderer_config::RenderConfig;
 use crate::ir::anchor::Anchor;
 use crate::ir::category::Category;
 
-// 渲染器实现：将 IR（Category/Anchor）转换为 HTML 字符串
 pub struct HtmlRenderer;
 
 impl Renderer for HtmlRenderer {
@@ -15,6 +14,7 @@ impl Renderer for HtmlRenderer {
         doc: &Category,
         _category_config: &CategoryConfig,
         renderer_config: &RenderConfig,
+        source_path: Option<&str>,
     ) -> String {
         let mut html = String::new();
 
@@ -22,7 +22,6 @@ impl Renderer for HtmlRenderer {
         html.push_str(&format!("<html lang=\"{}\">\n", &renderer_config.main_lang));
         html.push_str("<head>\n");
         html.push_str("<meta charset=\"utf-8\">\n");
-        // 取第一个一级标题作为页面标题，没有则用配置中的 site_title
         let page_title = doc.nodes.iter().find_map(|node| {
             if let Anchor::Heading { level: 1, content } = node {
                 Some(content.as_str())
@@ -33,7 +32,6 @@ impl Renderer for HtmlRenderer {
         html.push_str(&format!("<title>{}</title>\n", escape_html(page_title)));
         html.push_str("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
 
-        // 加载脚本
         for script in &renderer_config.scripts {
             html.push_str(&format!("<script src=\"{}\"></script>\n", escape_html(script)));
         }
@@ -42,7 +40,7 @@ impl Renderer for HtmlRenderer {
         html.push_str("<body>\n");
 
         for node in &doc.nodes {
-            html.push_str(&render_node(node, renderer_config));
+            html.push_str(&render_node(node, renderer_config, source_path));
             html.push('\n');
         }
 
@@ -56,6 +54,7 @@ impl Renderer for HtmlRenderer {
 fn render_node(
     node: &Anchor,
     renderer_config: &RenderConfig,
+    source_path: Option<&str>,
 ) -> String {
     match node {
         Anchor::Heading { level, content } => {
@@ -122,10 +121,15 @@ fn render_node(
                     }
                 };
                 if !src_file.exists() {
-                    eprintln!("Warning: linked lore file not found: {:?}", src_file);
+                    eprintln!(
+                        "Warning: lore link \"{}\" -> \"{}\"\n  in source file: {}\n  expected file not found: {:?}",
+                        name,
+                        path,
+                        source_path.unwrap_or("<unknown>"),
+                        src_file,
+                    );
                 }
             }
-            // href 指向对应的 .html
             let html_path = Path::new(path).with_extension("html");
             let href = resolve_path(html_path.to_str().unwrap_or(path), renderer_config);
             format!(
@@ -150,7 +154,6 @@ fn render_node(
     }
 }
 
-// 解析路径：处理相对路径和绝对路径
 fn resolve_path(
     path: &str,
     renderer_config: &RenderConfig,

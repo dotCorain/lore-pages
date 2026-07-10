@@ -1,53 +1,21 @@
-# Lore Pages Example
+# index
 
-A simple static site generator that turns .lore markup into HTML.
+## Learning
 
-## URL Links
+学习资料
 
-% Syntax: name | url
+## LaerProject
 
-GitHub | https://github.com
-Rust Language | https://www.rust-lang.org
+像素画图软件
 
-## Lore Links
+## LoreProject
 
-% Syntax: name = path
+抽象层通信规范
 
-Getting Started = getting-started
-Details = details
+## Shelf
 
-## Headings
+笔记
 
-### Level 3 Heading
+## Ahjzu
 
-#### Level 4 Heading
-
-Just a normal paragraph.
-
-## Inner URL Content (foldable)
-
-% Syntax: - title | url   and   + title | url
-
-- Introduction | https://example.com/intro
-+ Appendix | https://example.com/appendix
-
-## Inner Lore Content (foldable)
-
-% Syntax: - title = path   and   + title = path
-
-- More Details = details
-+ Tips = getting-started
-
-## Other Syntax
-
-% This line is a comment and won't appear in HTML
-
-Line before break
----
-Line after break
-
-| https://example.com/sample.png
-
-_ This is placeholder text
-
-### Empty lines between content are preserved
+学校的事

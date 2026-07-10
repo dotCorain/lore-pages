@@ -8,5 +8,6 @@ pub trait Renderer {
         doc: &Category,
         category_config: &CategoryConfig,
         renderer_config: &RenderConfig,
+        source_path: Option<&str>,
     ) -> String;
 }
