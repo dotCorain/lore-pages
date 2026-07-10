@@ -18,7 +18,7 @@ impl Parser for LorePagesParser {
         let lines = input.lines();
         for line in lines {
             if let Some((level, content)) = parse_heading(line) {
-                doc.push(Anchor::Heading { level, content });
+                doc.push(Anchor::Heading { level, content, link: None });
                 continue;
             }
 

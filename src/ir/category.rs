@@ -14,19 +14,13 @@ impl Category {
         self.nodes.push(anchor);
     }
 
-    /// 在每个 H2 标题后面自动插入一个 LoreLink，指向 `标题名/index`。
+    /// 给每个 H2 标题设置自动链接，指向 `标题名/index`。
+    /// 渲染时 H2 文本本身就是链接，不需要额外插入 LoreLink 节点。
     pub fn auto_link_h2(&mut self) {
-        let mut new_nodes = Vec::with_capacity(self.nodes.len() * 2);
-        for node in self.nodes.drain(..) {
-            match node {
-                Anchor::Heading { level: 2, content } => {
-                    let path = format!("{}/index", content);
-                    new_nodes.push(Anchor::Heading { level: 2, content: content.clone() });
-                    new_nodes.push(Anchor::LoreLink { name: content, path });
-                }
-                other => new_nodes.push(other),
+        for node in &mut self.nodes {
+            if let Anchor::Heading { level: 2, content, link } = node {
+                *link = Some(format!("{}/index", content));
             }
         }
-        self.nodes = new_nodes;
     }
 }

@@ -3,6 +3,7 @@ pub enum Anchor {
     Heading {
         level: u8, // from 1 to 4
         content: String,
+        link: Option<String>, // auto-link path (H2 headings)
     },
     Paragraph {
         content: String,

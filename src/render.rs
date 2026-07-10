@@ -23,7 +23,7 @@ impl Renderer for HtmlRenderer {
         html.push_str("<head>\n");
         html.push_str("<meta charset=\"utf-8\">\n");
         let page_title = doc.nodes.iter().find_map(|node| {
-            if let Anchor::Heading { level: 1, content } = node {
+            if let Anchor::Heading { level: 1, content, .. } = node {
                 Some(content.as_str())
             } else {
                 None
@@ -57,9 +57,22 @@ fn render_node(
     source_path: Option<&str>,
 ) -> String {
     match node {
-        Anchor::Heading { level, content } => {
+        Anchor::Heading { level, content, link } => {
             let tag = format!("h{}", level);
-            format!("  <{}>{}</{}>", tag, escape_html(content), tag)
+            let body = escape_html(content);
+            match link {
+                Some(path) if *level == 2 => {
+                    // H2 自动链接：标题文本可点击
+                    // 校验 & warning
+                    check_lore_link(content, path, renderer_config, source_path);
+                    let html_path = Path::new(path).with_extension("html");
+                    let href = resolve_path(html_path.to_str().unwrap_or(path), renderer_config);
+                    format!("  <{tag}><a href=\"{href}\" class=\"link_lore\">{body}</a></{tag}>")
+                }
+                _ => {
+                    format!("  <{tag}>{body}</{tag}>")
+                }
+            }
         }
         Anchor::BreakLine => "  <br>".to_string(),
         Anchor::PlaceHolderLine { .. } => String::new(),
@@ -110,26 +123,7 @@ fn render_node(
             )
         }
         Anchor::LoreLink { name, path } => {
-            // 校验源文件是否存在（自动补 .lore 扩展名）
-            if !renderer_config.from_lore_path.is_empty() {
-                let src_file = {
-                    let p = Path::new(&renderer_config.from_lore_path).join(path);
-                    if p.extension().is_none() {
-                        p.with_extension("lore")
-                    } else {
-                        p
-                    }
-                };
-                if !src_file.exists() {
-                    eprintln!(
-                        "Warning: lore link \"{}\" -> \"{}\"\n  in source file: {}\n  expected file not found: {:?}",
-                        name,
-                        path,
-                        source_path.unwrap_or("<unknown>"),
-                        src_file,
-                    );
-                }
-            }
+            check_lore_link(name, path, renderer_config, source_path);
             let html_path = Path::new(path).with_extension("html");
             let href = resolve_path(html_path.to_str().unwrap_or(path), renderer_config);
             format!(
@@ -151,6 +145,52 @@ fn render_node(
                 format!("  <p>{}</p>", escape_html(content))
             }
         }
+    }
+}
+
+/// 校验 lore 链接目标文件是否存在，打印详细 warning。
+fn check_lore_link(
+    name: &str,
+    path: &str,
+    renderer_config: &RenderConfig,
+    source_path: Option<&str>,
+) {
+    if renderer_config.from_lore_path.is_empty() {
+        return;
+    }
+    let base = Path::new(&renderer_config.from_lore_path);
+
+    // 目标 .lore 文件路径
+    let src_file = {
+        let p = base.join(path);
+        if p.extension().is_none() {
+            p.with_extension("lore")
+        } else {
+            p
+        }
+    };
+
+    if src_file.exists() {
+        return; // 一切正常
+    }
+
+    // 检查父目录是否存在
+    let parent = src_file.parent().unwrap_or(Path::new("."));
+    if parent != base && !parent.exists() {
+        eprintln!(
+            "Warning: lore link \"{name}\" -> \"{path}\"\n  in source file: {}\n  folder not found: {:?}",
+            source_path.unwrap_or("<unknown>"),
+            parent,
+        );
+    } else {
+        // 目录存在但没有 index.lore
+        let filename = src_file.file_name().unwrap_or_default();
+        eprintln!(
+            "Warning: lore link \"{name}\" -> \"{path}\"\n  in source file: {}\n  folder exists, but {:?} not found in {:?}",
+            source_path.unwrap_or("<unknown>"),
+            filename,
+            parent,
+        );
     }
 }
 
