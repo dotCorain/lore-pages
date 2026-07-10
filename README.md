@@ -1,4 +1,4 @@
-# Intro
+# Lore Pages
 
 ## src/ir
 
@@ -21,3 +21,11 @@
 ## src/framework
 
 基于 parser 和 render 导出 cli.
+
+# TODO List
+
+重写路径系统
+
+`serve` 指令
+
+抽象层和序列集成
