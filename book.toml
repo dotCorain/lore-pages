@@ -6,3 +6,5 @@ language = "zh" # My English typing is not good enough yet  uwu
 # git 仓库链接
 [output.html]
 git-repository-url = "https://github.com/dotCorain/lore-pages"
+
+# todo...

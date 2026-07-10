@@ -1,32 +1,48 @@
+# ── Lore Pages 配置示例 ──────────────────────────
+# [parser] 所有字段都有默认值，只写需要覆盖的即可。
+# 下面列出了全部可选字段及其默认值（注释形式）。
+# 取消注释即可覆盖。
+# ──────────────────────────────────────────────────
+
 [parser]
-url_link_key = "|"
-url_link_key_escape = "\\|"
-lore_link_key = "="
-lore_link_key_escape = "\\="
-comment_key = "%"
-comment_key_escape = "\\%"
-breakline_key = "---"
-breakline_key_escape = "\\---"
-image_key = "|"
-image_key_escape = "\\|"
-placeholder_key = "_"
-placeholder_key_escape = "\\_"
-inner_open_key = "-"
-inner_open_key_escape = "\\-"
-inner_close_key = "+"
-inner_close_key_escape = "\\+"
+# ── 链接语法 ──
+# url_link_key = "|"
+# url_link_key_escape = "\\|"
+# lore_link_key = "="
+# lore_link_key_escape = "\\="
+
+# ── 注释 ──
+# comment_key = "%"
+# comment_key_escape = "\\%"
+
+# ── 分隔线 ──
+# breakline_key = "---"           # ---
+# breakline_key_escape = "\\---"
+
+# ── 图片 ──
+# image_key = "|"
+# image_key_escape = "\\|"
+
+# ── 占位符 ──
+# placeholder_key = "_"
+# placeholder_key_escape = "\\_"
+
+# ── 折叠块（展开/折叠标记） ──
+# inner_open_key = "-"
+# inner_open_key_escape = "\\-"
+# inner_close_key = "+"
+# inner_close_key_escape = "\\+"
+
+# ── 折叠块内部链接类型 ──
 inner_url_key = "|"
 inner_url_key_escape = "\\|"
-inner_lore_key = "="
-inner_lore_key_escape = "\\="
+# inner_lore_key = "="
+# inner_lore_key_escape = "\\="
+
 
 [renderer]
-site_title = "Lore Pages Introduction"
-from_lore_path = "./docs-src"
-to_html_path = "./docs"
+site_title = "Lore Pages Example"
+from_lore_path = "./ExampleLoreProject/docs-src"
+to_html_path = "./ExampleLoreProject/docs"
 lang = "zh-CN"
-link_base = "https://dotcorain.github.io/lore-pages"
-scripts = [
-    "https://fleetinglore.github.io/lore-pages-scripts/main.js",
-    "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js",
-]
+link_base = ""

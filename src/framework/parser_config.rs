@@ -67,7 +67,7 @@ impl ParserConfig {
     // 从文件加载配置：使用泛型 `P: AsRef<Path>` 以接受
     //  `&str` / `String` / `PathBuf` 等多种路径类型
     // 返回 `Result<Self, Box<dyn std::error::Error>>`：成功返
-    // 回 ParserConfig，失败返回任意错误的“装箱” trait 对象
+    // 回 ParserConfig，失败返回任意错误的"装箱" trait 对象
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
         // 读取整个文件为 `String`：`fs::read_to_string` 返回
         //  `Result<String, std::io::Error>`。
@@ -103,30 +103,31 @@ impl ParserConfig {
             inner_close_key_escape: None,
         });
 
-        // 构造最终的 ParserConfig：对每个可能为 None 的字段使用默认值
-        // `unwrap_or_else(|| "...".to_string())` 只有在 Option 为
-        // None 时才执行闭包并返回默认字符串
+        // 构造最终的 ParserConfig：None 的字段使用 Default 实现中的值
+        // 注意：不能用 unwrap_or_default() —— Option<String>::default() 是 ""
+        // 会错误地覆盖掉真正的默认值（如 lore_link_key 的 "="）
+        let defaults = ParserConfig::default();
         Ok(Self {
-            url_link_key: parser.url_link_key.unwrap_or_default(),
-            url_link_key_escape: parser.url_link_key_escape.unwrap_or_default(),
-            lore_link_key: parser.lore_link_key.unwrap_or_default(),
-            lore_link_key_escape: parser.lore_link_key_escape.unwrap_or_default(),
-            comment_key: parser.comment_key.unwrap_or_default(),
-            comment_key_escape: parser.comment_key_escape.unwrap_or_default(),
-            placeholder_key: parser.placeholder_key.unwrap_or_default(),
-            placeholder_key_escape: parser.placeholder_key_escape.unwrap_or_default(),
-            breakline_key: parser.breakline_key.unwrap_or_default(),
-            breakline_key_escape: parser.breakline_key_escape.unwrap_or_default(),
-            image_key: parser.image_key.unwrap_or_default(),
-            image_key_escape: parser.image_key_escape.unwrap_or_default(),
-            inner_url_key: parser.inner_url_key.unwrap_or_default(),
-            inner_url_key_escape: parser.inner_url_key_escape.unwrap_or_default(),
-            inner_lore_key: parser.inner_lore_key.unwrap_or_default(),
-            inner_lore_key_escape: parser.inner_lore_key_escape.unwrap_or_default(),
-            inner_open_key: parser.inner_open_key.unwrap_or_default(),
-            inner_open_key_escape: parser.inner_open_key_escape.unwrap_or_default(),
-            inner_close_key: parser.inner_close_key.unwrap_or_default(),
-            inner_close_key_escape: parser.inner_close_key_escape.unwrap_or_default(),
+            url_link_key: parser.url_link_key.unwrap_or(defaults.url_link_key),
+            url_link_key_escape: parser.url_link_key_escape.unwrap_or(defaults.url_link_key_escape),
+            lore_link_key: parser.lore_link_key.unwrap_or(defaults.lore_link_key),
+            lore_link_key_escape: parser.lore_link_key_escape.unwrap_or(defaults.lore_link_key_escape),
+            comment_key: parser.comment_key.unwrap_or(defaults.comment_key),
+            comment_key_escape: parser.comment_key_escape.unwrap_or(defaults.comment_key_escape),
+            placeholder_key: parser.placeholder_key.unwrap_or(defaults.placeholder_key),
+            placeholder_key_escape: parser.placeholder_key_escape.unwrap_or(defaults.placeholder_key_escape),
+            breakline_key: parser.breakline_key.unwrap_or(defaults.breakline_key),
+            breakline_key_escape: parser.breakline_key_escape.unwrap_or(defaults.breakline_key_escape),
+            image_key: parser.image_key.unwrap_or(defaults.image_key),
+            image_key_escape: parser.image_key_escape.unwrap_or(defaults.image_key_escape),
+            inner_url_key: parser.inner_url_key.unwrap_or(defaults.inner_url_key),
+            inner_url_key_escape: parser.inner_url_key_escape.unwrap_or(defaults.inner_url_key_escape),
+            inner_lore_key: parser.inner_lore_key.unwrap_or(defaults.inner_lore_key),
+            inner_lore_key_escape: parser.inner_lore_key_escape.unwrap_or(defaults.inner_lore_key_escape),
+            inner_open_key: parser.inner_open_key.unwrap_or(defaults.inner_open_key),
+            inner_open_key_escape: parser.inner_open_key_escape.unwrap_or(defaults.inner_open_key_escape),
+            inner_close_key: parser.inner_close_key.unwrap_or(defaults.inner_close_key),
+            inner_close_key_escape: parser.inner_close_key_escape.unwrap_or(defaults.inner_close_key_escape),
         })
     }
 

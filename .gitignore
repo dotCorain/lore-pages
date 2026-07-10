@@ -12,3 +12,6 @@ target/
 
 # mdbook
 book/
+
+# Lore Pages
+ExampleLoreProject/docs

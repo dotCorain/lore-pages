@@ -1,0 +1,15 @@
+# Getting Started
+
+This is a sub-page linked from the index.
+
+## Steps
+
+First, install the tool:
+
+Install | https://crates.io/crates/lore-pages
+
+Then create a Lore.toml config file and some .lore source files.
+
+## Back
+
+Home = index

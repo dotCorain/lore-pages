@@ -35,14 +35,16 @@ impl RenderConfig {
         let toml_config: TomlConfig = toml::from_str(&content)?;
         let renderer = toml_config.renderer;
 
+        // None 的字段使用 Default 实现中的值，而非空字符串
+        let defaults = RenderConfig::default();
         Ok(Self {
-            site_title: renderer.site_title.unwrap_or_default(),
-            from_lore_path: renderer.from_lore_path.unwrap_or_default(),
-            to_html_path: renderer.to_html_path.unwrap_or_default(),
-            css_url: renderer.css_url.unwrap_or_default(),
-            main_lang: renderer.lang.unwrap_or_default(),
-            link_base: renderer.link_base.unwrap_or_default(),
-            scripts: renderer.scripts.unwrap_or_default(),
+            site_title: renderer.site_title.unwrap_or(defaults.site_title),
+            from_lore_path: renderer.from_lore_path.unwrap_or(defaults.from_lore_path),
+            to_html_path: renderer.to_html_path.unwrap_or(defaults.to_html_path),
+            css_url: renderer.css_url.unwrap_or(defaults.css_url),
+            main_lang: renderer.lang.unwrap_or(defaults.main_lang),
+            link_base: renderer.link_base.unwrap_or(defaults.link_base),
+            scripts: renderer.scripts.unwrap_or(defaults.scripts),
         })
     }
 
@@ -60,7 +62,7 @@ impl Default for RenderConfig {
             css_url: "https://fleetinglore.github.io/css/style.css".to_string(),
             main_lang: "en-US".to_string(),
             link_base: "".to_string(),
-            scripts: vec![], // 新增：默认为空
+            scripts: vec![],
         }
     }
 }

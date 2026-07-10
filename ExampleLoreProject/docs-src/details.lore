@@ -1,0 +1,28 @@
+# Details
+
+This page provides more detailed information about Lore Pages syntax.
+
+## All Heading Levels
+
+# H1 - Page Title
+## H2 - Section
+### H3 - Subsection
+#### H4 - Sub-subsection
+
+## Syntax Reference
+
+URL Link | https://example.com
+Lore Link = index
+
+% Comments start with %
+
+---
+Break lines separate content
+
+| https://example.com/img.png
+
+_ placeholder
+
+## Back
+
+Home = index

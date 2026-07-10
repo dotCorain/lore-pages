@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::framework::category_config::CategoryConfig;
 use crate::framework::renderer::Renderer;
 use crate::framework::renderer_config::RenderConfig;
@@ -20,7 +22,15 @@ impl Renderer for HtmlRenderer {
         html.push_str(&format!("<html lang=\"{}\">\n", &renderer_config.main_lang));
         html.push_str("<head>\n");
         html.push_str("<meta charset=\"utf-8\">\n");
-        html.push_str(&format!("<title>{}</title>\n", escape_html(&renderer_config.site_title)));
+        // 取第一个一级标题作为页面标题，没有则用配置中的 site_title
+        let page_title = doc.nodes.iter().find_map(|node| {
+            if let Anchor::Heading { level: 1, content } = node {
+                Some(content.as_str())
+            } else {
+                None
+            }
+        }).unwrap_or(&renderer_config.site_title);
+        html.push_str(&format!("<title>{}</title>\n", escape_html(page_title)));
         html.push_str("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
 
         // 加载脚本
@@ -95,15 +105,31 @@ fn render_node(
         }
         Anchor::UrlLink { name, url } => {
             format!(
-                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_url\" target=\"_blank\">{}</a></p>",
+                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_url\">{}</a></p>",
                 escape_html(url),
                 escape_html(name)
             )
         }
         Anchor::LoreLink { name, path } => {
-            let href = resolve_path(path, renderer_config);
+            // 校验源文件是否存在（自动补 .lore 扩展名）
+            if !renderer_config.from_lore_path.is_empty() {
+                let src_file = {
+                    let p = Path::new(&renderer_config.from_lore_path).join(path);
+                    if p.extension().is_none() {
+                        p.with_extension("lore")
+                    } else {
+                        p
+                    }
+                };
+                if !src_file.exists() {
+                    eprintln!("Warning: linked lore file not found: {:?}", src_file);
+                }
+            }
+            // href 指向对应的 .html
+            let html_path = Path::new(path).with_extension("html");
+            let href = resolve_path(html_path.to_str().unwrap_or(path), renderer_config);
             format!(
-                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_lore\" target=\"_blank\">{}</a></p>",
+                "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_lore\">{}</a></p>",
                 escape_html(&href),
                 escape_html(name)
             )
