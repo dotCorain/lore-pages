@@ -62,16 +62,13 @@ fn render_node(
             let body = escape_html(content);
             match link {
                 Some(path) if *level == 2 => {
-                    // H2 自动链接：标题文本可点击
-                    // 校验 & warning
-                    check_lore_link(content, path, renderer_config, source_path);
-                    let html_path = Path::new(path).with_extension("html");
-                    let href = resolve_path(html_path.to_str().unwrap_or(path), renderer_config);
+                    let resolved = resolve_link_from_source(path, source_path, renderer_config);
+                    check_lore_link(content, &resolved, renderer_config, source_path);
+                    let html_path = Path::new(&resolved).with_extension("html");
+                    let href = resolve_path(html_path.to_str().unwrap_or(&resolved), renderer_config);
                     format!("  <{tag}><a href=\"{href}\" class=\"link_lore\">{body}</a></{tag}>")
                 }
-                _ => {
-                    format!("  <{tag}>{body}</{tag}>")
-                }
+                _ => format!("  <{tag}>{body}</{tag}>"),
             }
         }
         Anchor::BreakLine => "  <br>".to_string(),
@@ -80,8 +77,7 @@ fn render_node(
         Anchor::InnerUrlOpen { title, url } => {
             format!(
                 "<div class=\"foldable expanded\" data-url=\"{}\" data-title=\"{}\"></div>",
-                escape_html(url),
-                escape_html(title)
+                escape_html(url), escape_html(title)
             )
         }
         Anchor::InnerUrlClose { title, url } => {
@@ -90,8 +86,7 @@ fn render_node(
             } else {
                 format!(
                     "<div class=\"foldable\" data-url=\"{}\" data-title=\"{}\"></div>",
-                    escape_html(url),
-                    escape_html(title)
+                    escape_html(url), escape_html(title)
                 )
             }
         }
@@ -99,8 +94,7 @@ fn render_node(
             let href = resolve_path(path, renderer_config);
             format!(
                 "<div class=\"foldable lore expanded\" data-url=\"{}\" data-title=\"{}\"></div>",
-                escape_html(&href),
-                escape_html(title)
+                escape_html(&href), escape_html(title)
             )
         }
         Anchor::InnerLoreClose { title, path } => {
@@ -110,34 +104,28 @@ fn render_node(
                 let href = resolve_path(path, renderer_config);
                 format!(
                     "<div class=\"foldable lore\" data-url=\"{}\" data-title=\"{}\"></div>",
-                    escape_html(&href),
-                    escape_html(title)
+                    escape_html(&href), escape_html(title)
                 )
             }
         }
         Anchor::UrlLink { name, url } => {
             format!(
                 "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_url\">{}</a></p>",
-                escape_html(url),
-                escape_html(name)
+                escape_html(url), escape_html(name)
             )
         }
         Anchor::LoreLink { name, path } => {
-            check_lore_link(name, path, renderer_config, source_path);
-            let html_path = Path::new(path).with_extension("html");
-            let href = resolve_path(html_path.to_str().unwrap_or(path), renderer_config);
+            let resolved = resolve_link_from_source(path, source_path, renderer_config);
+            check_lore_link(name, &resolved, renderer_config, source_path);
+            let html_path = Path::new(&resolved).with_extension("html");
+            let href = resolve_path(html_path.to_str().unwrap_or(&resolved), renderer_config);
             format!(
                 "  <p style=\"margin-left: 20px\"><a href=\"{}\" class=\"link_lore\">{}</a></p>",
-                escape_html(&href),
-                escape_html(name)
+                escape_html(&href), escape_html(name)
             )
         }
-        Anchor::Comment { content } => {
-            format!("  <!-- {} -->", content)
-        }
-        Anchor::Image { url } => {
-            format!("  <img src=\"{}\">", url)
-        }
+        Anchor::Comment { content } => format!("  <!-- {} -->", content),
+        Anchor::Image { url } => format!("  <img src=\"{}\">", url),
         Anchor::Paragraph { content } => {
             if content.trim().is_empty() {
                 String::new()
@@ -148,56 +136,67 @@ fn render_node(
     }
 }
 
-/// 校验 lore 链接目标文件是否存在，打印详细 warning。
+/// 基于源文件所在目录修正链接路径。
+/// 例如：源文件 foo/bar/index.lore，链接目标 buz/index
+/// → foo/bar/buz/index
+fn resolve_link_from_source(
+    link_path: &str,
+    source_path: Option<&str>,
+    renderer_config: &RenderConfig,
+) -> String {
+    let src = match source_path {
+        Some(s) => s,
+        None => return link_path.to_string(),
+    };
+    let src_path = Path::new(src);
+    let parent = match src_path.parent() {
+        Some(p) => p,
+        None => return link_path.to_string(),
+    };
+    let base = Path::new(&renderer_config.from_lore_path);
+    let rel = match parent.strip_prefix(base) {
+        Ok(r) => r,
+        Err(_) => parent,
+    };
+    let rel_str = rel.to_string_lossy();
+    if rel_str.is_empty() || rel_str == "." {
+        link_path.to_string()
+    } else {
+        format!("{}/{}", rel_str, link_path)
+    }
+}
+
+/// 校验 lore 链接目标文件是否存在。
 fn check_lore_link(
     name: &str,
     path: &str,
     renderer_config: &RenderConfig,
     source_path: Option<&str>,
 ) {
-    if renderer_config.from_lore_path.is_empty() {
-        return;
-    }
+    if renderer_config.from_lore_path.is_empty() { return; }
     let base = Path::new(&renderer_config.from_lore_path);
-
-    // 目标 .lore 文件路径
     let src_file = {
         let p = base.join(path);
-        if p.extension().is_none() {
-            p.with_extension("lore")
-        } else {
-            p
-        }
+        if p.extension().is_none() { p.with_extension("lore") } else { p }
     };
+    if src_file.exists() { return; }
 
-    if src_file.exists() {
-        return; // 一切正常
-    }
-
-    // 检查父目录是否存在
     let parent = src_file.parent().unwrap_or(Path::new("."));
     if parent != base && !parent.exists() {
         eprintln!(
             "Warning: lore link \"{name}\" -> \"{path}\"\n  in source file: {}\n  folder not found: {:?}",
-            source_path.unwrap_or("<unknown>"),
-            parent,
+            source_path.unwrap_or("<unknown>"), parent,
         );
     } else {
-        // 目录存在但没有 index.lore
         let filename = src_file.file_name().unwrap_or_default();
         eprintln!(
             "Warning: lore link \"{name}\" -> \"{path}\"\n  in source file: {}\n  folder exists, but {:?} not found in {:?}",
-            source_path.unwrap_or("<unknown>"),
-            filename,
-            parent,
+            source_path.unwrap_or("<unknown>"), filename, parent,
         );
     }
 }
 
-fn resolve_path(
-    path: &str,
-    renderer_config: &RenderConfig,
-) -> String {
+fn resolve_path(path: &str, renderer_config: &RenderConfig) -> String {
     if renderer_config.link_base.is_empty() || path.starts_with("http://") || path.starts_with("https://") {
         path.to_string()
     } else {
