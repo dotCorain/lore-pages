@@ -119,7 +119,7 @@ fn is_lore_file(path: &Path) -> bool {
 /// 返回 `None` 表示 git 不可用或目录不在 git 仓库中，此时应回退到目录遍历。
 fn collect_lore_files_via_git(src_dir: &Path) -> Option<Vec<PathBuf>> {
     let output = Command::new("git")
-        .args(["-C", src_dir.to_str()?, "ls-files", "--", "*.lore"])
+        .args(["-C", src_dir.to_str()?, "-c", "core.quotepath=false", "ls-files", "--", "*.lore"])
         .output()
         .ok()?;
 
