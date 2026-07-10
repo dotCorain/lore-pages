@@ -83,6 +83,10 @@ where
         let src_path = entry.path();
 
         if src_path.is_dir() {
+            // 跳过 .git 目录，避免递归进入 submodule
+            if src_path.file_name().map_or(false, |n| n == ".git") {
+                continue;
+            }
             let dir_name = src_path.file_name().unwrap();
             let dst_path = dst_dir.join(dir_name);
             convert_directory(converter, &src_path, &dst_path)?;

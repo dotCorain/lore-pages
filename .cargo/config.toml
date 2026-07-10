@@ -1,0 +1,4 @@
+# macOS 交叉编译 Linux 需要指定 musl 工具链的链接器
+# 安装: brew install FiloSottile/musl-cross/musl-cross
+[target.x86_64-unknown-linux-musl]
+linker = "x86_64-linux-musl-gcc"
