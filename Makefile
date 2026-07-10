@@ -3,7 +3,7 @@ VERSION := $(shell cargo metadata --no-deps --format-version=1 | jq -r '.package
 BIN_NAME := lore-pages
 
 # 目标平台
-LINUX_TARGET := x86_64-unknown-linux-gnu
+LINUX_TARGET := x86_64-unknown-linux-musl
 MACOS_TARGET := aarch64-apple-darwin
 MACOS_X86_TARGET := x86_64-apple-darwin
 WINDOWS_TARGET := x86_64-pc-windows-gnu
