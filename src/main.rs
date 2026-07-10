@@ -7,7 +7,8 @@ use lore_pages::render::HtmlRenderer;
 // 标准库：文件读写与路径处理
 
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::process::Command;
 // 程序入口
 // 返回 `Result<(), Box<dyn std::error::Error>>`：
 // - `Box<dyn std::error::Error>` 是一个“装箱”的 trait 对象，用来统一不同错误类型，便于主函数返回各种可能的错误
@@ -41,8 +42,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &parser_config,
     );
 
-    // 将源目录递归转换到目标目录
-    convert_directory(&converter, src_dir, dst_dir)?;
+    // 优先使用 git ls-files 快速获取文件列表，失败则回退到目录遍历
+    match collect_lore_files_via_git(src_dir) {
+        Some(files) => {
+            println!("Found {} .lore files via git ls-files", files.len());
+            convert_files(&converter, src_dir, dst_dir, &files)?;
+        }
+        None => {
+            convert_directory(&converter, src_dir, dst_dir)?;
+        }
+    }
 
     println!("done.");
     Ok(())
@@ -99,4 +108,81 @@ fn is_lore_file(path: &Path) -> bool {
         .and_then(|e| e.to_str())
         .map(|e| e == "lore")
         .unwrap_or(false)
+}
+
+/// 使用 `git ls-files` 快速收集 `src_dir` 下所有 `.lore` 文件。
+/// 相比文件系统遍历，git 索引在大目录下速度更快。
+/// 返回 `None` 表示 git 不可用或目录不在 git 仓库中，此时应回退到目录遍历。
+fn collect_lore_files_via_git(src_dir: &Path) -> Option<Vec<PathBuf>> {
+    let output = Command::new("git")
+        .args(["-C", src_dir.to_str()?, "ls-files", "--", "*.lore"])
+        .output()
+        .ok()?;
+
+    if !output.status.success() {
+        return None;
+    }
+
+    let stdout = String::from_utf8(output.stdout).ok()?;
+    let files: Vec<PathBuf> = stdout
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| src_dir.join(line.trim()))
+        .collect();
+
+    if files.is_empty() {
+        None
+    } else {
+        Some(files)
+    }
+}
+
+/// 将给定的 `.lore` 文件列表转换到目标目录，保留子目录结构。
+fn convert_files<'a, P, R>(
+    converter: &CategoryConverter<'a, P, R>,
+    src_dir: &Path,
+    dst_dir: &Path,
+    files: &[PathBuf],
+) -> std::io::Result<()>
+where
+    P: lore_pages::framework::parser::Parser,
+    R: lore_pages::framework::renderer::Renderer,
+{
+    if !dst_dir.exists() {
+        fs::create_dir_all(dst_dir)?;
+    }
+
+    for src_path in files {
+        if !src_path.exists() {
+            eprintln!("Warning: file not found, skipping: {:?}", src_path);
+            continue;
+        }
+
+        // 计算相对于 src_dir 的路径
+        let rel_path = match src_path.strip_prefix(src_dir) {
+            Ok(p) => p,
+            Err(_) => {
+                eprintln!("Warning: cannot compute relative path for {:?}", src_path);
+                continue;
+            }
+        };
+
+        // 构建目标路径，保持子目录结构
+        let dst_path = if let Some(parent) = rel_path.parent() {
+            let dir = dst_dir.join(parent);
+            fs::create_dir_all(&dir)?;
+            dir.join(rel_path.file_stem().unwrap()).with_extension("html")
+        } else {
+            dst_dir
+                .join(rel_path.file_stem().unwrap())
+                .with_extension("html")
+        };
+
+        let content = fs::read_to_string(src_path)?;
+        let html = converter.convert_simple(&content);
+        fs::write(&dst_path, html)?;
+        println!("{:?} -> {:?}", src_path, dst_path);
+    }
+
+    Ok(())
 }
