@@ -23,12 +23,6 @@ jobs:
               with:
                   mdbook-version: "latest"
 
-            # EPUB
-            # Currently disabled due to
-            # https://github.com/nnethercote/perf-book/actions/runs/6358429874/job/17270643057
-            #- name: Setup mdbook-epub
-            #  run: cargo install mdbook-epub
-
             - name: Build
               run: mdbook build
 
@@ -36,7 +30,5 @@ jobs:
               uses: peaceiris/actions-gh-pages@v4
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
-                  #publish_dir: ./book/html  # use if EPUB is enabled
-                  publish_dir: ./book # use if EPUB is disabled
-              # Always deploy on push
+                  publish_dir: ./docs/book # use if EPUB is disabled
               if: github.event_name == 'push'
