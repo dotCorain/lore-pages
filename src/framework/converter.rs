@@ -4,6 +4,11 @@ use crate::framework::parser_config::ParserConfig;
 use crate::framework::renderer::Renderer;
 use crate::framework::renderer_config::RenderConfig;
 
+/// Combines a [`Parser`] and [`Renderer`] into a single conversion pipeline.
+///
+/// This is the primary entry point for turning Lore source text into
+/// rendered output. It holds references to configuration and delegates
+/// to the parser and renderer implementations.
 pub struct CategoryConverter<'a, P, R> {
     parser: P,
     renderer: R,
@@ -19,6 +24,7 @@ where
     P: Parser,
     R: Renderer,
 {
+    /// Build a converter from a parser, renderer, and configuration references.
     pub fn from_config(
         parser: P,
         renderer: R,
@@ -35,6 +41,7 @@ where
         }
     }
 
+    /// Parse and render with explicit configuration overrides.
     pub fn convert<'b>(
         &self,
         raw: &'b str,
@@ -45,13 +52,12 @@ where
     ) -> String {
         let mut doc = self.parser.parse(raw, category_config, parser_config);
         doc.auto_link_h2();
-        self.renderer.render(&doc, category_config, renderer_config, source_path)
+        self.renderer
+            .render(&doc, category_config, renderer_config, source_path)
     }
 
-    pub fn convert_simple(
-        &self,
-        raw: &str,
-    ) -> String {
+    /// Convenience method: convert using the converter's stored configuration.
+    pub fn convert_simple(&self, raw: &str) -> String {
         self.convert(
             raw,
             self.category_config,
@@ -61,12 +67,9 @@ where
         )
     }
 
-    /// 同 convert_simple，但传入源文件路径用于 warning 信息。
-    pub fn convert_with_source(
-        &self,
-        raw: &str,
-        source_path: &str,
-    ) -> String {
+    /// Convenience method: like `convert_simple`, but passes a source file
+    /// path for use in warning messages and relative link resolution.
+    pub fn convert_with_source(&self, raw: &str, source_path: &str) -> String {
         self.convert(
             raw,
             self.category_config,
@@ -76,14 +79,17 @@ where
         )
     }
 
+    /// Return the configured CSS URL.
     pub fn css_url(&self) -> &str {
         &self.renderer_config.css_url
     }
 
+    /// Access the parser.
     pub fn parser(&self) -> &P {
         &self.parser
     }
 
+    /// Access the renderer.
     pub fn renderer(&self) -> &R {
         &self.renderer
     }

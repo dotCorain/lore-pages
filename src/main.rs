@@ -84,7 +84,7 @@ where
 
         if src_path.is_dir() {
             // 跳过 .git 目录，避免递归进入 submodule
-            if src_path.file_name().map_or(false, |n| n == ".git") {
+            if src_path.file_name().is_some_and(|n| n == ".git") {
                 continue;
             }
             let dir_name = src_path.file_name().unwrap();
