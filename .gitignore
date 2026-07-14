@@ -2,7 +2,7 @@
 .DS_Store
 
 # mdbook
-book/
+docs/book/
 
 # Lore Pages
 ExampleLoreProject/docs
