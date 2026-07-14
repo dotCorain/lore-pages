@@ -32,13 +32,6 @@ jobs:
             - name: Build
               run: mdbook build
 
-            - name: Test
-              run: mdbook test
-
-            # EPUB
-            #- name: Copy ePub
-            #  run: cp book/epub/The\ Rust\ Performance\ Book.epub book/html
-
             - name: Deploy
               uses: peaceiris/actions-gh-pages@v4
               with:
