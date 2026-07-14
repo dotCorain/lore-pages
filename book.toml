@@ -1,8 +1,8 @@
 [book]
-title = "Lore Pages Document"
+title = "Lore Pages 文档"
 authors = ["Fleeting Lore"]
-language = "zh" # My English typing is not good enough yet  uwu
+language = "zh"
+src = "docs"
 
-# git 仓库链接
 [output.html]
 git-repository-url = "https://github.com/dotCorain/lore-pages"

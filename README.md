@@ -2,7 +2,7 @@
 
 轻量级静态网站生成器，将自定义 `.lore` 标记语言编译为 HTML。
 
-[![License]](#)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-2024%20edition-orange.svg)](https://www.rust-lang.org)
 
 ## 理念
